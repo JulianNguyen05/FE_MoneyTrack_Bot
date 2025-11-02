@@ -14,7 +14,7 @@ public class TokenManager {
     // ✅ Sử dụng Singleton để quản lý token toàn app
     private static TokenManager instance;
 
-    private TokenManager(Context context) {
+    public TokenManager(Context context) {
         sharedPreferences = context.getApplicationContext()
                 .getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
         editor = sharedPreferences.edit();
