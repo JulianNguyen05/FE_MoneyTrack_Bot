@@ -1,75 +1,114 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-xmlns:app="http://schemas.android.com/apk/res-auto"
-xmlns:tools="http://schemas.android.com/tools"
-android:layout_width="match_parent"
-android:layout_height="match_parent"
-android:orientation="vertical"
-android:padding="16dp"
-tools:context=".activities.MainActivity">
-
-<TextView
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:text="TỔNG SỐ DƯ"
-    android:textSize="16sp" />
-
-<TextView
-    android:id="@+id/textViewTotalBalance"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:text="0 đ"
-    android:textSize="34sp"
-    android:textStyle="bold"
-    android:textColor="@color/black" />
-
-<View
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="1dp"
-    android:background="#CCCCCC"
-    android:layout_marginTop="16dp"
-    android:layout_marginBottom="16dp"/>
+    android:layout_height="match_parent"
+    tools:context=".activities.MainActivity">
 
-<Button
-    android:id="@+id/buttonGoToCategories"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:text="Quản lý Danh mục" />
+    <TextView
+        android:id="@+id/textViewTotalBalanceTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:text="TỔNG SỐ DƯ"
+        android:textSize="16sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
+    <TextView
+        android:id="@+id/textViewTotalBalance"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="0 đ"
+        android:textSize="34sp"
+        android:textStyle="bold"
+        android:textColor="@color/black"
+        app:layout_constraintStart_toStartOf="@+id/textViewTotalBalanceTitle"
+        app:layout_constraintTop_toBottomOf="@+id/textViewTotalBalanceTitle" />
 
+    <View
+        android:id="@+id/viewDivider"
+        android:layout_width="0dp"
+        android:layout_height="1dp"
+        android:background="#CCCCCC"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/textViewTotalBalance"
+        app:layout_constraintTop_toBottomOf="@+id/textViewTotalBalance" />
+
+    <LinearLayout
+        android:id="@+id/buttonContainer"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="8dp"
+        app:layout_constraintEnd_toEndOf="@+id/viewDivider"
+        app:layout_constraintStart_toStartOf="@+id/viewDivider"
+        app:layout_constraintTop_toBottomOf="@+id/viewDivider">
+
+        <Button
+            android:id="@+id/buttonGoToCategories"
+            style="?android:attr/buttonBarButtonStyle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Danh mục"
+            android:textSize="12sp" />
+
+        <Button
+            android:id="@+id/buttonGoToWallets"
+            style="?android:attr/buttonBarButtonStyle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Ví tiền"
+            android:textSize="12sp" />
+
+        <Button
+            android:id="@+id/buttonLogout"
+            style="?android:attr/buttonBarButtonStyle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Đăng xuất"
+            android:textSize="12sp" />
+
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/textViewRecentTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Giao dịch gần đây"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:layout_marginTop="16dp"
+        app:layout_constraintStart_toStartOf="@+id/viewDivider"
+        app:layout_constraintTop_toBottomOf="@+id/buttonContainer" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerViewTransactions"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="8dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="@+id/viewDivider"
+        app:layout_constraintStart_toStartOf="@+id/viewDivider"
+        app:layout_constraintTop_toBottomOf="@+id/textViewRecentTitle" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fab_add_transaction"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="16dp"
-        android:src="@drawable/ic_launcher_background"
+        android:clickable="true"
+        android:focusable="true"
+        android:contentDescription="Thêm giao dịch mới"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
-<Button
-    android:id="@+id/buttonGoToWallets"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:text="Quản lý Ví" />
-
-<Button
-    android:id="@+id/buttonLogout"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:text="Đăng xuất" />
-
-<TextView
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:text="Giao dịch gần đây"
-    android:textSize="20sp"
-    android:textStyle="bold"
-    android:layout_marginTop="16dp"/>
-
-<androidx.recyclerview.widget.RecyclerView
-    android:id="@+id/recyclerViewTransactions"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent" />
-
-</LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>
