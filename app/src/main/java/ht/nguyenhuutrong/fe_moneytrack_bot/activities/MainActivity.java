@@ -64,12 +64,21 @@ public class MainActivity extends AppCompatActivity {
         // --- Tải danh sách giao dịch ---
         fetchTransactions();
 
-        // --- Chuyển sang CategoryActivity ---
+        // --- Nút chuyển sang CategoryActivity ---
         Button buttonGoToCategories = findViewById(R.id.buttonGoToCategories);
         buttonGoToCategories.setOnClickListener(v -> {
-            Intent intent = new Intent(MainActivity.this, CategoryActivity.class);
-            startActivity(intent);
+            startActivity(new Intent(MainActivity.this, CategoryActivity.class));
         });
+
+        // --- Nút Đăng xuất (chỉ gọi nếu layout có nút này) ---
+        Button buttonLogout = findViewById(R.id.buttonLogout);
+        if (buttonLogout != null) {
+            buttonLogout.setOnClickListener(v -> {
+                tokenManager.clearToken();
+                startActivity(new Intent(MainActivity.this, LoginActivity.class));
+                finish();
+            });
+        }
     }
 
     private void fetchTransactions() {
@@ -81,11 +90,9 @@ public class MainActivity extends AppCompatActivity {
                 if (response.isSuccessful() && response.body() != null) {
                     adapter.setData(response.body());
                 } else if (response.code() == 401) {
-                    // Hết hạn token → đăng nhập lại
                     Toast.makeText(MainActivity.this, "Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.", Toast.LENGTH_LONG).show();
                     tokenManager.clearToken();
-                    Intent intent = new Intent(MainActivity.this, LoginActivity.class);
-                    startActivity(intent);
+                    startActivity(new Intent(MainActivity.this, LoginActivity.class));
                     finish();
                 } else {
                     Toast.makeText(MainActivity.this, "Không thể tải dữ liệu (" + response.code() + ")", Toast.LENGTH_SHORT).show();
