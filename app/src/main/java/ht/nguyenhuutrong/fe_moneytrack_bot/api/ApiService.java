@@ -7,6 +7,7 @@ import ht.nguyenhuutrong.fe_moneytrack_bot.models.LoginRequest;
 import ht.nguyenhuutrong.fe_moneytrack_bot.models.LoginResponse;
 import ht.nguyenhuutrong.fe_moneytrack_bot.models.RegisterRequest;
 import ht.nguyenhuutrong.fe_moneytrack_bot.models.Transaction;
+import ht.nguyenhuutrong.fe_moneytrack_bot.models.Wallet;
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.Field;
@@ -17,32 +18,46 @@ import retrofit2.http.POST;
 
 public interface ApiService {
 
-    // Đăng ký người dùng mới
+    // ------------------- User -------------------
+
     @POST("api/users/")
     Call<Void> registerUser(@Body RegisterRequest registerRequest);
 
-    // Đăng nhập người dùng -> nhận token
     @POST("api/token/")
     Call<LoginResponse> loginUser(@Body LoginRequest loginRequest);
 
-    // Lấy danh sách giao dịch (yêu cầu token xác thực)
+    // ------------------- Transactions -------------------
+
     @GET("api/transactions/")
     Call<List<Transaction>> getTransactions(@Header("Authorization") String authToken);
 
-    // Lấy danh sách danh mục (categories)
+    // (Tùy chọn) Thêm giao dịch mới
+    // @POST("api/transactions/")
+    // Call<Transaction> createTransaction(@Header("Authorization") String authToken, @Body Transaction transaction);
+
+    // ------------------- Categories -------------------
+
     @GET("api/categories/")
     Call<List<Category>> getCategories(@Header("Authorization") String authToken);
 
-    // Tạo một category mới (gửi form có 2 trường 'name' và 'type')
     @FormUrlEncoded
     @POST("api/categories/")
     Call<Category> createCategory(
             @Header("Authorization") String authToken,
             @Field("name") String name,
-            @Field("type") String type // 'income' (thu) hoặc 'expense' (chi)
+            @Field("type") String type // 'income' hoặc 'expense'
     );
 
-    // (Tùy chọn) Thêm giao dịch mới
-    // @POST("api/transactions/")
-    // Call<Transaction> createTransaction(@Header("Authorization") String authToken, @Body Transaction transaction);
+    // ------------------- Wallets -------------------
+
+    @GET("api/wallets/")
+    Call<List<Wallet>> getWallets(@Header("Authorization") String authToken);
+
+    @FormUrlEncoded
+    @POST("api/wallets/")
+    Call<Wallet> createWallet(
+            @Header("Authorization") String authToken,
+            @Field("name") String name,
+            @Field("balance") double balance
+    );
 }

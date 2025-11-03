@@ -36,6 +36,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
 
         tokenManager = new TokenManager(this);
         authToken = tokenManager.getToken();
@@ -48,7 +49,7 @@ public class MainActivity extends AppCompatActivity {
             return;
         }
 
-        setContentView(R.layout.activity_main);
+        authToken = "Bearer " + authToken; // Chuẩn hóa token
 
         // --- Khởi tạo RecyclerView ---
         recyclerView = findViewById(R.id.recyclerViewTransactions);
@@ -66,11 +67,19 @@ public class MainActivity extends AppCompatActivity {
 
         // --- Nút chuyển sang CategoryActivity ---
         Button buttonGoToCategories = findViewById(R.id.buttonGoToCategories);
-        buttonGoToCategories.setOnClickListener(v -> {
-            startActivity(new Intent(MainActivity.this, CategoryActivity.class));
-        });
+        if (buttonGoToCategories != null) {
+            buttonGoToCategories.setOnClickListener(v ->
+                    startActivity(new Intent(MainActivity.this, CategoryActivity.class)));
+        }
 
-        // --- Nút Đăng xuất (chỉ gọi nếu layout có nút này) ---
+        // --- Nút chuyển sang WalletActivity ---
+        Button buttonGoToWallets = findViewById(R.id.buttonGoToWallets);
+        if (buttonGoToWallets != null) {
+            buttonGoToWallets.setOnClickListener(v ->
+                    startActivity(new Intent(MainActivity.this, WalletActivity.class)));
+        }
+
+        // --- Nút Đăng xuất ---
         Button buttonLogout = findViewById(R.id.buttonLogout);
         if (buttonLogout != null) {
             buttonLogout.setOnClickListener(v -> {
@@ -82,9 +91,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void fetchTransactions() {
-        Call<List<Transaction>> call = apiService.getTransactions("Bearer " + authToken);
-
-        call.enqueue(new Callback<List<Transaction>>() {
+        apiService.getTransactions(authToken).enqueue(new Callback<List<Transaction>>() {
             @Override
             public void onResponse(Call<List<Transaction>> call, Response<List<Transaction>> response) {
                 if (response.isSuccessful() && response.body() != null) {
