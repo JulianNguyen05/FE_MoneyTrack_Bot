@@ -3,8 +3,10 @@ package ht.nguyenhuutrong.fe_moneytrack_bot.activities;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.Button;
 import android.widget.Toast;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -26,37 +28,48 @@ public class MainActivity extends AppCompatActivity {
 
     private RecyclerView recyclerView;
     private TransactionAdapter adapter;
-    private List<Transaction> transactionList = new ArrayList<>();
+    private List<Transaction> transactionList;
     private ApiService apiService;
     private TokenManager tokenManager;
     private String authToken;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         tokenManager = new TokenManager(this);
         authToken = tokenManager.getToken();
 
-        // Kiểm tra trạng thái đăng nhập
-        if (authToken == null) {
-            Intent intent = new Intent(MainActivity.this, LoginActivity.class);
-            startActivity(intent);
+        // --- Kiểm tra đăng nhập ---
+        if (authToken == null || authToken.isEmpty()) {
+            Toast.makeText(this, "Vui lòng đăng nhập trước khi sử dụng!", Toast.LENGTH_SHORT).show();
+            startActivity(new Intent(MainActivity.this, LoginActivity.class));
             finish();
             return;
         }
 
         setContentView(R.layout.activity_main);
 
+        // --- Khởi tạo RecyclerView ---
         recyclerView = findViewById(R.id.recyclerViewTransactions);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
+        transactionList = new ArrayList<>();
         adapter = new TransactionAdapter(transactionList);
         recyclerView.setAdapter(adapter);
 
+        // --- Khởi tạo API ---
         apiService = RetrofitClient.getClient().create(ApiService.class);
 
+        // --- Tải danh sách giao dịch ---
         fetchTransactions();
+
+        // --- Chuyển sang CategoryActivity ---
+        Button buttonGoToCategories = findViewById(R.id.buttonGoToCategories);
+        buttonGoToCategories.setOnClickListener(v -> {
+            Intent intent = new Intent(MainActivity.this, CategoryActivity.class);
+            startActivity(intent);
+        });
     }
 
     private void fetchTransactions() {
@@ -68,6 +81,7 @@ public class MainActivity extends AppCompatActivity {
                 if (response.isSuccessful() && response.body() != null) {
                     adapter.setData(response.body());
                 } else if (response.code() == 401) {
+                    // Hết hạn token → đăng nhập lại
                     Toast.makeText(MainActivity.this, "Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.", Toast.LENGTH_LONG).show();
                     tokenManager.clearToken();
                     Intent intent = new Intent(MainActivity.this, LoginActivity.class);

@@ -9,18 +9,35 @@
     android:background="#FFFFFF"
     tools:context=".activities.MainActivity">
 
+    <!-- Nút chuyển sang quản lý danh mục -->
+    <Button
+        android:id="@+id/buttonGoToCategories"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Quản lý Danh mục"
+        android:textAllCaps="false"
+        android:backgroundTint="@android:color/holo_green_dark"
+        android:textColor="@android:color/white"
+        android:paddingHorizontal="16dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginStart="16dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
     <!-- Tiêu đề trang -->
     <TextView
         android:id="@+id/textViewTitle"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:text="Danh sách giao dịch"
         android:textSize="20sp"
         android:textStyle="bold"
         android:textColor="@android:color/black"
         android:layout_marginTop="16dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintStart_toEndOf="@id/buttonGoToCategories"
         app:layout_constraintEnd_toEndOf="parent" />
 
     <!-- Nút làm mới -->
@@ -33,7 +50,7 @@
         android:backgroundTint="@android:color/holo_blue_dark"
         android:textColor="@android:color/white"
         android:paddingHorizontal="16dp"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="12dp"
         app:layout_constraintTop_toBottomOf="@id/textViewTitle"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
