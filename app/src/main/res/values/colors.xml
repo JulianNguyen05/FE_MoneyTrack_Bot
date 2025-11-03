@@ -1,5 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- Text -->
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+
+    <!-- Nền -->
+    <color name="background">#F5F5F5</color>
+
+    <!-- Nút MainActivity -->
+    <color name="green_700">#388E3C</color>   <!-- Nút Danh mục -->
+    <color name="orange_700">#F57C00</color>  <!-- Nút Ví -->
+    <color name="red_700">#D32F2F</color>     <!-- Nút Đăng xuất -->
+    <color name="blue_700">#1976D2</color>    <!-- Nút Làm mới -->
 </resources>
