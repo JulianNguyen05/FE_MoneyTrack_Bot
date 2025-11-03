@@ -15,50 +15,58 @@ import retrofit2.http.Field;
 import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
 import retrofit2.http.Header;
+import retrofit2.http.PATCH;
 import retrofit2.http.POST;
 import retrofit2.http.PUT;
 import retrofit2.http.Path;
 
 public interface ApiService {
 
-    // ------------------- USER -------------------
+    // ==========================================================
+    // 🧑 USER (Đăng ký / Đăng nhập)
+    // ==========================================================
 
     // Đăng ký tài khoản
     @POST("api/users/")
     Call<Void> registerUser(@Body RegisterRequest registerRequest);
 
-    // Đăng nhập, lấy token
+    // Đăng nhập để lấy JWT token
     @POST("api/token/")
     Call<LoginResponse> loginUser(@Body LoginRequest loginRequest);
 
-    // ------------------- TRANSACTIONS -------------------
 
-    // Lấy danh sách giao dịch
+    // ==========================================================
+    // 💸 TRANSACTIONS
+    // ==========================================================
+
+    // Lấy danh sách giao dịch của user
     @GET("api/transactions/")
-    Call<List<Transaction>> getTransactions(@Header("Authorization") String authToken);
+    Call<List<Transaction>> getTransactions(
+            @Header("Authorization") String authToken
+    );
 
-    // Thêm giao dịch mới (nếu backend hỗ trợ POST)
-    // @FormUrlEncoded
-    // @POST("api/transactions/")
-    // Call<Transaction> createTransaction(
-    //     @Header("Authorization") String authToken,
-    //     @Field("amount") double amount,
-    //     @Field("description") String description,
-    //     @Field("date") String date,
-    //     @Field("category") int categoryId,
-    //     @Field("wallet") int walletId
-    // );
+    // Thêm giao dịch mới
+    @FormUrlEncoded
+    @POST("api/transactions/")
+    Call<Transaction> createTransaction(
+            @Header("Authorization") String authToken,
+            @Field("amount") double amount,
+            @Field("description") String description,
+            @Field("date") String date, // "YYYY-MM-DD"
+            @Field("category") int categoryId,
+            @Field("wallet") int walletId
+    );
 
-    // Lấy chi tiết giao dịch
+    // Lấy chi tiết giao dịch theo ID
     @GET("api/transactions/{id}/")
     Call<Transaction> getTransactionDetails(
             @Header("Authorization") String authToken,
             @Path("id") int transactionId
     );
 
-    // Cập nhật giao dịch
+    // Cập nhật (Sửa) giao dịch
     @FormUrlEncoded
-    @PUT("api/transactions/{id}/")
+    @PUT("api/transactions/{id}/")  // hoặc dùng @PATCH nếu backend hỗ trợ partial update
     Call<Transaction> updateTransaction(
             @Header("Authorization") String authToken,
             @Path("id") int transactionId,
@@ -76,11 +84,16 @@ public interface ApiService {
             @Path("id") int transactionId
     );
 
-    // ------------------- CATEGORIES -------------------
+
+    // ==========================================================
+    // 🏷️ CATEGORIES
+    // ==========================================================
 
     // Lấy danh sách danh mục
     @GET("api/categories/")
-    Call<List<Category>> getCategories(@Header("Authorization") String authToken);
+    Call<List<Category>> getCategories(
+            @Header("Authorization") String authToken
+    );
 
     // Tạo danh mục mới
     @FormUrlEncoded
@@ -91,11 +104,16 @@ public interface ApiService {
             @Field("type") String type // "income" hoặc "expense"
     );
 
-    // ------------------- WALLETS -------------------
+
+    // ==========================================================
+    // 💰 WALLETS
+    // ==========================================================
 
     // Lấy danh sách ví
     @GET("api/wallets/")
-    Call<List<Wallet>> getWallets(@Header("Authorization") String authToken);
+    Call<List<Wallet>> getWallets(
+            @Header("Authorization") String authToken
+    );
 
     // Tạo ví mới
     @FormUrlEncoded

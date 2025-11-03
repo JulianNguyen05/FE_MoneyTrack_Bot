@@ -21,16 +21,26 @@ public class Transaction {
     @SerializedName("category_name")
     private String categoryName;
 
+    // Lưu ID của Category
+    @SerializedName("category")
+    private int category;
+
+    // Lưu ID của Wallet
+    @SerializedName("wallet")
+    private int wallet;
+
     // ✅ Constructor rỗng để Gson có thể parse JSON
     public Transaction() {}
 
     // ✅ Constructor đầy đủ (dùng nếu tạo transaction thủ công)
-    public Transaction(int id, double amount, String description, String date, String categoryName) {
+    public Transaction(int id, double amount, String description, String date, String categoryName, int category, int wallet) {
         this.id = id;
         this.amount = amount;
         this.description = description;
         this.date = date;
         this.categoryName = categoryName;
+        this.category = category;
+        this.wallet = wallet;
     }
 
     // ✅ Getters & Setters
@@ -72,5 +82,23 @@ public class Transaction {
 
     public void setCategoryName(String categoryName) {
         this.categoryName = categoryName;
+    }
+
+    // ✅ Getter & Setter cho Category
+    public int getCategory() {
+        return category;
+    }
+
+    public void setCategory(int category) {
+        this.category = category;
+    }
+
+    // ✅ Getter & Setter cho Wallet
+    public int getWallet() {
+        return wallet;
+    }
+
+    public void setWallet(int wallet) {
+        this.wallet = wallet;
     }
 }

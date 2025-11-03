@@ -17,9 +17,14 @@
         android:theme="@style/Theme.FE_MoneyTrack_Bot"
         tools:targetApi="31">
         <activity
-            android:name=".activities.WalletActivity"
+            android:name=".activities.AddTransactionActivity"
             android:exported="false" />
-        <!-- Activity đăng nhập (Launcher) -->
+        <activity
+            android:name=".activities.EditTransactionActivity"
+            android:exported="false" />
+        <activity
+            android:name=".activities.WalletActivity"
+            android:exported="false" /> <!-- Activity đăng nhập (Launcher) -->
         <activity
             android:name=".activities.LoginActivity"
             android:exported="true">

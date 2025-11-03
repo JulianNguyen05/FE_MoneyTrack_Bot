@@ -1,5 +1,6 @@
 package ht.nguyenhuutrong.fe_moneytrack_bot.activities;
 
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -11,6 +12,8 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.text.NumberFormat;
 import java.util.ArrayList;
@@ -28,7 +31,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements TransactionAdapter.TransactionClickListener {
 
     private RecyclerView recyclerView;
     private TransactionAdapter adapter;
@@ -58,20 +61,20 @@ public class MainActivity extends AppCompatActivity {
         textViewTotalBalance = findViewById(R.id.textViewTotalBalance);
         recyclerView = findViewById(R.id.recyclerViewTransactions);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        adapter = new TransactionAdapter(new ArrayList<>());
+
+        adapter = new TransactionAdapter(new ArrayList<>(), this);
         recyclerView.setAdapter(adapter);
 
         apiService = RetrofitClient.getClient().create(ApiService.class);
 
-        // Setup các nút
         setupButtons();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        loadDashboardData(); // Tải tổng số dư
-        loadTransactions();  // Tải giao dịch
+        loadDashboardData();
+        loadTransactions();
     }
 
     private void setupButtons() {
@@ -89,8 +92,14 @@ public class MainActivity extends AppCompatActivity {
         Button buttonGoToWallets = findViewById(R.id.buttonGoToWallets);
         buttonGoToWallets.setOnClickListener(v ->
                 startActivity(new Intent(this, WalletActivity.class)));
+
+        // --- NÚT FLOATING ACTION BUTTON (+) ---
+        FloatingActionButton fabAdd = findViewById(R.id.fab_add_transaction);
+        fabAdd.setOnClickListener(v ->
+                startActivity(new Intent(this, AddTransactionActivity.class)));
     }
 
+    // --- Tải tổng số dư ---
     private void loadDashboardData() {
         apiService.getWallets(authToken).enqueue(new Callback<List<Wallet>>() {
             @Override
@@ -115,6 +124,7 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    // --- Tải danh sách giao dịch ---
     private void loadTransactions() {
         apiService.getTransactions(authToken).enqueue(new Callback<List<Transaction>>() {
             @Override
@@ -135,6 +145,46 @@ public class MainActivity extends AppCompatActivity {
             public void onFailure(Call<List<Transaction>> call, Throwable t) {
                 Toast.makeText(MainActivity.this, "Lỗi mạng (tải giao dịch): " + t.getMessage(), Toast.LENGTH_SHORT).show();
                 Log.e("API_FAILURE", t.getMessage(), t);
+            }
+        });
+    }
+
+    // --- Khi click "Sửa" ---
+    @Override
+    public void onEditClick(Transaction transaction) {
+        Intent intent = new Intent(MainActivity.this, EditTransactionActivity.class);
+        intent.putExtra("TRANSACTION_ID", transaction.getId());
+        startActivity(intent);
+    }
+
+    // --- Khi click "Xóa" ---
+    @Override
+    public void onDeleteClick(Transaction transaction) {
+        new AlertDialog.Builder(this)
+                .setTitle("Xác nhận Xóa")
+                .setMessage("Bạn có chắc muốn xóa giao dịch này?\n(" + transaction.getCategoryName() + ": " + transaction.getAmount() + ")")
+                .setPositiveButton("Xóa", (dialog, which) -> deleteTransaction(transaction.getId()))
+                .setNegativeButton("Hủy", null)
+                .show();
+    }
+
+    // --- API Xóa giao dịch ---
+    private void deleteTransaction(int transactionId) {
+        apiService.deleteTransaction(authToken, transactionId).enqueue(new Callback<Void>() {
+            @Override
+            public void onResponse(Call<Void> call, Response<Void> response) {
+                if (response.isSuccessful()) {
+                    Toast.makeText(MainActivity.this, "Đã xóa giao dịch", Toast.LENGTH_SHORT).show();
+                    loadDashboardData();
+                    loadTransactions();
+                } else {
+                    Toast.makeText(MainActivity.this, "Xóa thất bại", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Void> call, Throwable t) {
+                Toast.makeText(MainActivity.this, "Lỗi mạng: " + t.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
     }
