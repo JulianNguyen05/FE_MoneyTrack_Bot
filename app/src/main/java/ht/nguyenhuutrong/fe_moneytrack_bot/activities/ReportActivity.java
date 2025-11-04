@@ -7,6 +7,7 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.github.mikephil.charting.charts.PieChart;
+import com.github.mikephil.charting.components.Legend;
 import com.github.mikephil.charting.data.PieData;
 import com.github.mikephil.charting.data.PieDataSet;
 import com.github.mikephil.charting.data.PieEntry;
@@ -57,14 +58,22 @@ public class ReportActivity extends AppCompatActivity {
     private void setupPieChart() {
         pieChart.getDescription().setEnabled(false);
         pieChart.setUsePercentValues(true);
-        pieChart.setEntryLabelTextSize(12f);
-        pieChart.setEntryLabelColor(Color.BLACK);
         pieChart.setHoleRadius(25f);
         pieChart.setTransparentCircleRadius(30f);
+        pieChart.setDrawEntryLabels(false);
+
+        Legend legend = pieChart.getLegend();
+        legend.setEnabled(true);
+        legend.setVerticalAlignment(Legend.LegendVerticalAlignment.BOTTOM);
+        legend.setHorizontalAlignment(Legend.LegendHorizontalAlignment.CENTER);
+        legend.setOrientation(Legend.LegendOrientation.HORIZONTAL);
+        legend.setWordWrapEnabled(true);
+        legend.setDrawInside(false);
+        legend.setTextSize(12f);
     }
 
     private void loadReportData() {
-        // 👇 Gọi API có tham số ngày (null = lấy mặc định 30 ngày qua)
+        // Gọi API lấy dữ liệu báo cáo (mặc định 30 ngày qua)
         apiService.getReportSummary(authToken, null, null).enqueue(new Callback<List<ReportEntry>>() {
             @Override
             public void onResponse(Call<List<ReportEntry>> call, Response<List<ReportEntry>> response) {
@@ -72,16 +81,21 @@ public class ReportActivity extends AppCompatActivity {
                     List<ReportEntry> reportList = response.body();
                     if (reportList.isEmpty()) {
                         Toast.makeText(ReportActivity.this, "Không có dữ liệu chi tiêu!", Toast.LENGTH_SHORT).show();
+                        pieChart.setCenterText("Không có dữ liệu");
+                        pieChart.invalidate();
+                        return;
                     }
                     populatePieChart(reportList);
                 } else {
-                    Toast.makeText(ReportActivity.this, "Không thể tải báo cáo (mã " + response.code() + ")", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(ReportActivity.this,
+                            "Không thể tải báo cáo (mã lỗi: " + response.code() + ")", Toast.LENGTH_SHORT).show();
                 }
             }
 
             @Override
             public void onFailure(Call<List<ReportEntry>> call, Throwable t) {
-                Toast.makeText(ReportActivity.this, "Lỗi mạng: " + t.getMessage(), Toast.LENGTH_LONG).show();
+                Toast.makeText(ReportActivity.this,
+                        "Lỗi mạng: " + t.getMessage(), Toast.LENGTH_LONG).show();
             }
         });
     }
@@ -90,26 +104,33 @@ public class ReportActivity extends AppCompatActivity {
         ArrayList<PieEntry> entries = new ArrayList<>();
 
         for (ReportEntry entry : reportData) {
-            // Thêm dữ liệu cho từng danh mục
-            entries.add(new PieEntry((float) entry.getTotalAmount(), entry.getCategoryName()));
+            if (entry.getTotalAmount() > 0) {
+                entries.add(new PieEntry((float) entry.getTotalAmount(), entry.getCategoryName()));
+            }
         }
 
         if (entries.isEmpty()) {
-            pieChart.clear();
-            pieChart.setCenterText("Không có dữ liệu chi tiêu");
+            pieChart.setCenterText("Không có dữ liệu hợp lệ");
             pieChart.invalidate();
             return;
         }
 
-        PieDataSet dataSet = new PieDataSet(entries, "Chi tiêu theo danh mục");
+        PieDataSet dataSet = new PieDataSet(entries, "");
         dataSet.setColors(ColorTemplate.MATERIAL_COLORS);
-        dataSet.setValueTextColor(Color.BLACK);
-        dataSet.setValueTextSize(14f);
+        dataSet.setDrawValues(true);
         dataSet.setValueFormatter(new PercentFormatter(pieChart));
+        dataSet.setValueTextSize(14f);
+        dataSet.setValueTextColor(Color.BLACK);
+
+        // Hiển thị giá trị (%) bên ngoài miếng bánh
+        dataSet.setValueLinePart1OffsetPercentage(100.f);
+        dataSet.setValueLinePart1Length(0.4f);
+        dataSet.setValueLinePart2Length(0.4f);
+        dataSet.setYValuePosition(PieDataSet.ValuePosition.OUTSIDE_SLICE);
 
         PieData pieData = new PieData(dataSet);
         pieChart.setData(pieData);
-        pieChart.animateY(800);
-        pieChart.invalidate(); // Vẽ lại biểu đồ
+        pieChart.animateY(1000);
+        pieChart.invalidate();
     }
 }
