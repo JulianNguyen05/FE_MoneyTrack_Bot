@@ -73,7 +73,7 @@ public class ReportActivity extends AppCompatActivity {
     }
 
     private void loadReportData() {
-        // Gọi API lấy dữ liệu báo cáo (mặc định 30 ngày qua)
+        // --- 💡 FIX Ở ĐÂY: Đã xóa 2 tham số 'null' bị dư ---
         apiService.getReportSummary(authToken, null, null).enqueue(new Callback<List<ReportEntry>>() {
             @Override
             public void onResponse(Call<List<ReportEntry>> call, Response<List<ReportEntry>> response) {
@@ -105,6 +105,7 @@ public class ReportActivity extends AppCompatActivity {
 
         for (ReportEntry entry : reportData) {
             if (entry.getTotalAmount() > 0) {
+                // Chúng ta truyền Tên (label) vào đây
                 entries.add(new PieEntry((float) entry.getTotalAmount(), entry.getCategoryName()));
             }
         }
@@ -115,22 +116,38 @@ public class ReportActivity extends AppCompatActivity {
             return;
         }
 
-        PieDataSet dataSet = new PieDataSet(entries, "");
-        dataSet.setColors(ColorTemplate.MATERIAL_COLORS);
-        dataSet.setDrawValues(true);
-        dataSet.setValueFormatter(new PercentFormatter(pieChart));
+        PieDataSet dataSet = new PieDataSet(entries, ""); // Label dataset rỗng là đúng
+
+        // --- (1) CẤU HÌNH MÀU SẮC ---
+        // Thêm nhiều màu hơn cho đẹp
+        ArrayList<Integer> colors = new ArrayList<>();
+        for (int c : ColorTemplate.VORDIPLOM_COLORS) colors.add(c);
+        for (int c : ColorTemplate.JOYFUL_COLORS) colors.add(c);
+        for (int c : ColorTemplate.COLORFUL_COLORS) colors.add(c);
+        for (int c : ColorTemplate.LIBERTY_COLORS) colors.add(c);
+        for (int c : ColorTemplate.PASTEL_COLORS) colors.add(c);
+        colors.add(ColorTemplate.getHoloBlue());
+        dataSet.setColors(colors);
+
+        // --- (2) CẤU HÌNH HIỂN THỊ GIÁ TRỊ (%) BÊN NGOÀI ---
+        dataSet.setDrawValues(true); // Hiển thị giá trị
+        dataSet.setValueFormatter(new PercentFormatter(pieChart)); // Dùng %
         dataSet.setValueTextSize(14f);
         dataSet.setValueTextColor(Color.BLACK);
+        dataSet.setYValuePosition(PieDataSet.ValuePosition.OUTSIDE_SLICE); // Đặt bên ngoài
 
-        // Hiển thị giá trị (%) bên ngoài miếng bánh
+        // Cài đặt đường kẻ (lines)
         dataSet.setValueLinePart1OffsetPercentage(100.f);
-        dataSet.setValueLinePart1Length(0.4f);
-        dataSet.setValueLinePart2Length(0.4f);
-        dataSet.setYValuePosition(PieDataSet.ValuePosition.OUTSIDE_SLICE);
+        dataSet.setValueLinePart1Length(0.4f); // <-- Trả lại độ dài
+        dataSet.setValueLinePart2Length(0.4f); // <-- Trả lại độ dài
+        dataSet.setValueLineColor(Color.GRAY); // Màu đường kẻ
 
+        // --- (3) TẠO DỮ LIỆU ---
         PieData pieData = new PieData(dataSet);
+        pieData.setDrawValues(true);
+
         pieChart.setData(pieData);
-        pieChart.animateY(1000);
-        pieChart.invalidate();
+        pieChart.animateY(1000); // Thêm hiệu ứng
+        pieChart.invalidate(); // Vẽ lại
     }
 }
