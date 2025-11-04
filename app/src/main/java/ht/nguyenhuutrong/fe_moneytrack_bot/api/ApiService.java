@@ -8,6 +8,8 @@ import ht.nguyenhuutrong.fe_moneytrack_bot.models.LoginResponse;
 import ht.nguyenhuutrong.fe_moneytrack_bot.models.RegisterRequest;
 import ht.nguyenhuutrong.fe_moneytrack_bot.models.Transaction;
 import ht.nguyenhuutrong.fe_moneytrack_bot.models.Wallet;
+import ht.nguyenhuutrong.fe_moneytrack_bot.models.ReportEntry; // ✅ Thêm dòng này
+
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.DELETE;
@@ -19,6 +21,7 @@ import retrofit2.http.PATCH;
 import retrofit2.http.POST;
 import retrofit2.http.PUT;
 import retrofit2.http.Path;
+import retrofit2.http.Query; // ✅ Thêm dòng này
 
 public interface ApiService {
 
@@ -127,5 +130,17 @@ public interface ApiService {
             @Field("amount") double amount,
             @Field("date") String date, // "YYYY-MM-DD"
             @Field("description") String description
+    );
+
+
+    // ==========================================================
+    // 📊 REPORT (Tổng hợp chi tiêu theo danh mục)
+    // ==========================================================
+
+    @GET("api/reports/summary/")
+    Call<List<ReportEntry>> getReportSummary(
+            @Header("Authorization") String authToken,
+            @Query("start_date") String startDate,
+            @Query("end_date") String endDate
     );
 }

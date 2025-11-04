@@ -7,6 +7,7 @@
     android:layout_height="match_parent"
     tools:context=".activities.MainActivity">
 
+    <!-- Tiêu đề tổng số dư -->
     <TextView
         android:id="@+id/textViewTotalBalanceTitle"
         android:layout_width="wrap_content"
@@ -18,6 +19,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <!-- Tổng số dư -->
     <TextView
         android:id="@+id/textViewTotalBalance"
         android:layout_width="wrap_content"
@@ -26,29 +28,31 @@
         android:textSize="34sp"
         android:textStyle="bold"
         android:textColor="@color/black"
-        app:layout_constraintStart_toStartOf="@+id/textViewTotalBalanceTitle"
-        app:layout_constraintTop_toBottomOf="@+id/textViewTotalBalanceTitle" />
+        app:layout_constraintStart_toStartOf="@id/textViewTotalBalanceTitle"
+        app:layout_constraintTop_toBottomOf="@id/textViewTotalBalanceTitle" />
 
+    <!-- Đường kẻ ngăn cách -->
     <View
         android:id="@+id/viewDivider"
         android:layout_width="0dp"
         android:layout_height="1dp"
-        android:background="#CCCCCC"
         android:layout_marginTop="16dp"
         android:layout_marginEnd="16dp"
+        android:background="#CCCCCC"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="@+id/textViewTotalBalance"
-        app:layout_constraintTop_toBottomOf="@+id/textViewTotalBalance" />
+        app:layout_constraintStart_toStartOf="@id/textViewTotalBalance"
+        app:layout_constraintTop_toBottomOf="@id/textViewTotalBalance" />
 
+    <!-- Nhóm nút chức năng -->
     <LinearLayout
         android:id="@+id/buttonContainer"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:layout_marginTop="8dp"
-        app:layout_constraintEnd_toEndOf="@+id/viewDivider"
-        app:layout_constraintStart_toStartOf="@+id/viewDivider"
-        app:layout_constraintTop_toBottomOf="@+id/viewDivider">
+        app:layout_constraintEnd_toEndOf="@id/viewDivider"
+        app:layout_constraintStart_toStartOf="@id/viewDivider"
+        app:layout_constraintTop_toBottomOf="@id/viewDivider">
 
         <Button
             android:id="@+id/buttonGoToCategories"
@@ -69,6 +73,24 @@
             android:textSize="12sp" />
 
         <Button
+            android:id="@+id/buttonGoToTransfer"
+            style="?android:attr/buttonBarButtonStyle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Chuyển tiền"
+            android:textSize="12sp" />
+
+        <Button
+            android:id="@+id/buttonReport"
+            style="?android:attr/buttonBarButtonStyle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Báo cáo"
+            android:textSize="12sp" />
+
+        <Button
             android:id="@+id/buttonLogout"
             style="?android:attr/buttonBarButtonStyle"
             android:layout_width="0dp"
@@ -79,6 +101,7 @@
 
     </LinearLayout>
 
+    <!-- Tiêu đề giao dịch gần đây -->
     <TextView
         android:id="@+id/textViewRecentTitle"
         android:layout_width="wrap_content"
@@ -87,19 +110,21 @@
         android:textSize="20sp"
         android:textStyle="bold"
         android:layout_marginTop="16dp"
-        app:layout_constraintStart_toStartOf="@+id/viewDivider"
-        app:layout_constraintTop_toBottomOf="@+id/buttonContainer" />
+        app:layout_constraintStart_toStartOf="@id/viewDivider"
+        app:layout_constraintTop_toBottomOf="@id/buttonContainer" />
 
+    <!-- Danh sách giao dịch -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerViewTransactions"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginTop="8dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="@+id/viewDivider"
-        app:layout_constraintStart_toStartOf="@+id/viewDivider"
-        app:layout_constraintTop_toBottomOf="@+id/textViewRecentTitle" />
+        app:layout_constraintEnd_toEndOf="@id/viewDivider"
+        app:layout_constraintStart_toStartOf="@id/viewDivider"
+        app:layout_constraintTop_toBottomOf="@id/textViewRecentTitle" />
 
+    <!-- Nút thêm giao dịch -->
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fab_add_transaction"
         android:layout_width="wrap_content"
@@ -108,16 +133,8 @@
         android:clickable="true"
         android:focusable="true"
         android:contentDescription="Thêm giao dịch mới"
+        app:srcCompat="@drawable/ic_add"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
-
-    <Button
-        android:id="@+id/buttonGoToTransfer"
-        style="?android:attr/buttonBarButtonStyle"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:text="Chuyển tiền"
-        android:textSize="12sp" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

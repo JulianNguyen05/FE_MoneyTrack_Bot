@@ -79,6 +79,7 @@ public class MainActivity extends AppCompatActivity implements TransactionAdapte
 
     // --- Cấu hình các nút ---
     private void setupButtons() {
+        // Đăng xuất
         Button buttonLogout = findViewById(R.id.buttonLogout);
         buttonLogout.setOnClickListener(v -> {
             tokenManager.clearToken();
@@ -86,22 +87,31 @@ public class MainActivity extends AppCompatActivity implements TransactionAdapte
             finish();
         });
 
+        // Danh mục
         Button buttonGoToCategories = findViewById(R.id.buttonGoToCategories);
         buttonGoToCategories.setOnClickListener(v ->
                 startActivity(new Intent(this, CategoryActivity.class)));
 
+        // Ví tiền
         Button buttonGoToWallets = findViewById(R.id.buttonGoToWallets);
         buttonGoToWallets.setOnClickListener(v ->
                 startActivity(new Intent(this, WalletActivity.class)));
 
-        // --- NÚT MỚI: Chuyển tiền ---
+        // Chuyển tiền
         Button buttonGoToTransfer = findViewById(R.id.buttonGoToTransfer);
         if (buttonGoToTransfer != null) {
             buttonGoToTransfer.setOnClickListener(v ->
                     startActivity(new Intent(this, TransferActivity.class)));
         }
 
-        // --- NÚT FLOATING ACTION BUTTON (+) ---
+        // Báo cáo (NEW)
+        Button buttonReport = findViewById(R.id.buttonReport);
+        if (buttonReport != null) {
+            buttonReport.setOnClickListener(v ->
+                    startActivity(new Intent(this, ReportActivity.class)));
+        }
+
+        // Nút Floating (+)
         FloatingActionButton fabAdd = findViewById(R.id.fab_add_transaction);
         fabAdd.setOnClickListener(v ->
                 startActivity(new Intent(this, AddTransactionActivity.class)));
