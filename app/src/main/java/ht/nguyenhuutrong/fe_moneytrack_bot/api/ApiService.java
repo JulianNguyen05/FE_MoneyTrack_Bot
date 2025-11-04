@@ -26,11 +26,9 @@ public interface ApiService {
     // 🧑 USER (Đăng ký / Đăng nhập)
     // ==========================================================
 
-    // Đăng ký tài khoản
     @POST("api/users/")
     Call<Void> registerUser(@Body RegisterRequest registerRequest);
 
-    // Đăng nhập để lấy JWT token
     @POST("api/token/")
     Call<LoginResponse> loginUser(@Body LoginRequest loginRequest);
 
@@ -39,45 +37,40 @@ public interface ApiService {
     // 💸 TRANSACTIONS
     // ==========================================================
 
-    // Lấy danh sách giao dịch của user
     @GET("api/transactions/")
     Call<List<Transaction>> getTransactions(
             @Header("Authorization") String authToken
     );
 
-    // Thêm giao dịch mới
     @FormUrlEncoded
     @POST("api/transactions/")
     Call<Transaction> createTransaction(
             @Header("Authorization") String authToken,
             @Field("amount") double amount,
             @Field("description") String description,
-            @Field("date") String date, // "YYYY-MM-DD"
+            @Field("date") String date,
             @Field("category") int categoryId,
             @Field("wallet") int walletId
     );
 
-    // Lấy chi tiết giao dịch theo ID
     @GET("api/transactions/{id}/")
     Call<Transaction> getTransactionDetails(
             @Header("Authorization") String authToken,
             @Path("id") int transactionId
     );
 
-    // Cập nhật (Sửa) giao dịch
     @FormUrlEncoded
-    @PUT("api/transactions/{id}/")  // hoặc dùng @PATCH nếu backend hỗ trợ partial update
+    @PUT("api/transactions/{id}/")
     Call<Transaction> updateTransaction(
             @Header("Authorization") String authToken,
             @Path("id") int transactionId,
             @Field("amount") double amount,
             @Field("description") String description,
-            @Field("date") String date, // "YYYY-MM-DD"
+            @Field("date") String date,
             @Field("category") int categoryId,
             @Field("wallet") int walletId
     );
 
-    // Xóa giao dịch
     @DELETE("api/transactions/{id}/")
     Call<Void> deleteTransaction(
             @Header("Authorization") String authToken,
@@ -89,13 +82,11 @@ public interface ApiService {
     // 🏷️ CATEGORIES
     // ==========================================================
 
-    // Lấy danh sách danh mục
     @GET("api/categories/")
     Call<List<Category>> getCategories(
             @Header("Authorization") String authToken
     );
 
-    // Tạo danh mục mới
     @FormUrlEncoded
     @POST("api/categories/")
     Call<Category> createCategory(
@@ -109,18 +100,32 @@ public interface ApiService {
     // 💰 WALLETS
     // ==========================================================
 
-    // Lấy danh sách ví
     @GET("api/wallets/")
     Call<List<Wallet>> getWallets(
             @Header("Authorization") String authToken
     );
 
-    // Tạo ví mới
     @FormUrlEncoded
     @POST("api/wallets/")
     Call<Wallet> createWallet(
             @Header("Authorization") String authToken,
             @Field("name") String name,
             @Field("balance") double balance
+    );
+
+
+    // ==========================================================
+    // 🔁 TRANSFER (Chuyển tiền giữa 2 ví)
+    // ==========================================================
+
+    @FormUrlEncoded
+    @POST("api/transfer/")
+    Call<Void> transferFunds(
+            @Header("Authorization") String authToken,
+            @Field("from_wallet_id") int fromWalletId,
+            @Field("to_wallet_id") int toWalletId,
+            @Field("amount") double amount,
+            @Field("date") String date, // "YYYY-MM-DD"
+            @Field("description") String description
     );
 }

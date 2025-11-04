@@ -2,6 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     package="ht.nguyenhuutrong.fe_moneytrack_bot">
+
     <!-- Quyền truy cập Internet -->
     <uses-permission android:name="android.permission.INTERNET" />
 
@@ -16,6 +17,29 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.FE_MoneyTrack_Bot"
         tools:targetApi="31">
+
+        <!-- 🔹 Activity khởi động (Launcher) -->
+        <activity
+            android:name=".activities.LoginActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <!-- 🔹 Activity chính sau khi đăng nhập -->
+        <activity
+            android:name=".activities.MainActivity"
+            android:exported="false" />
+
+        <!-- 🔹 Các Activity quản lý dữ liệu -->
+        <activity
+            android:name=".activities.CategoryActivity"
+            android:exported="false" />
+        <activity
+            android:name=".activities.WalletActivity"
+            android:exported="false" />
         <activity
             android:name=".activities.AddTransactionActivity"
             android:exported="false" />
@@ -23,23 +47,10 @@
             android:name=".activities.EditTransactionActivity"
             android:exported="false" />
         <activity
-            android:name=".activities.WalletActivity"
-            android:exported="false" /> <!-- Activity đăng nhập (Launcher) -->
-        <activity
-            android:name=".activities.LoginActivity"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
+            android:name=".activities.TransferActivity"
+            android:exported="false" />
 
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity> <!-- Activity chính -->
-        <activity
-            android:name=".activities.MainActivity"
-            android:exported="false" /> <!-- Activity quản lý danh mục -->
-        <activity
-            android:name=".activities.CategoryActivity"
-            android:exported="false" /> <!-- Activity đăng ký -->
+        <!-- 🔹 Activity đăng ký tài khoản -->
         <activity
             android:name=".activities.RegisterActivity"
             android:exported="false" />

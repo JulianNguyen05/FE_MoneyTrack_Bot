@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true"
+    android:background="@color/white">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="20dp">
+
+        <!-- Tiêu đề -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Chuyển tiền giữa các ví"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:textColor="@color/black"
+            android:layout_gravity="center_horizontal"
+            android:paddingBottom="12dp" />
+
+        <!-- Chọn ví nguồn -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Từ ví:"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:layout_marginTop="12dp"
+            android:textColor="@color/black" />
+
+        <Spinner
+            android:id="@+id/spinnerFromWallet"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:background="@android:drawable/btn_dropdown" />
+
+        <!-- Chọn ví đích -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Đến ví:"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:layout_marginTop="16dp"
+            android:textColor="@color/black" />
+
+        <Spinner
+            android:id="@+id/spinnerToWallet"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:background="@android:drawable/btn_dropdown" />
+
+        <!-- Nhập số tiền -->
+        <EditText
+            android:id="@+id/editTextAmount"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Nhập số tiền cần chuyển"
+            android:inputType="numberDecimal"
+            android:textSize="18sp"
+            android:layout_marginTop="20dp"
+            android:padding="10dp"
+            android:background="@android:drawable/edit_text"
+            android:textColor="@color/black" />
+
+        <!-- Mô tả -->
+        <EditText
+            android:id="@+id/editTextDescription"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Ghi chú (VD: Rút tiền, Chuyển sang ví tiết kiệm...)"
+            android:textSize="16sp"
+            android:layout_marginTop="16dp"
+            android:padding="10dp"
+            android:background="@android:drawable/edit_text"
+            android:textColor="@color/black" />
+
+        <!-- Nút chọn ngày -->
+        <Button
+            android:id="@+id/buttonSelectDate"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Chọn ngày (mặc định: hôm nay)"
+            android:textAllCaps="false"
+            android:layout_marginTop="20dp"
+            android:backgroundTint="@color/black"
+            android:textColor="@color/white" />
+
+        <!-- Nút xác nhận -->
+        <Button
+            android:id="@+id/buttonConfirmTransfer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Xác nhận chuyển tiền"
+            android:textAllCaps="false"
+            android:textColor="@color/white"
+            android:backgroundTint="@color/orange_700"
+            android:layout_marginTop="28dp"
+            android:padding="12dp" />
+
+    </LinearLayout>
+</ScrollView>
