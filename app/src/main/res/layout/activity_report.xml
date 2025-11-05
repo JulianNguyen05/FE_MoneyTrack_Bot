@@ -5,18 +5,29 @@
     android:orientation="vertical"
     android:padding="16dp">
 
+    <!-- PHẦN ĐẦU: TIÊU ĐỀ + NÚT LỌC -->
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Báo cáo Chi tiêu"
         android:textSize="24sp"
-        android:textStyle="bold" />
+        android:textStyle="bold"
+        android:textColor="@android:color/black"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginBottom="8dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="30 ngày qua"
+        android:textColor="@android:color/darker_gray"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginBottom="16dp" />
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_marginTop="16dp">
+        android:orientation="horizontal">
 
         <Button
             android:id="@+id/buttonStartDate"
@@ -31,20 +42,54 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="Đến ngày"
-            android:layout_marginStart="8dp"/>
-
+            android:layout_marginStart="8dp" />
     </LinearLayout>
 
     <Button
         android:id="@+id/buttonFilter"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Xem Báo cáo" />
+        android:text="Xem Báo cáo"
+        android:layout_marginTop="12dp" />
 
-    <com.github.mikephil.charting.charts.PieChart
-        android:id="@+id/pieChart"
+    <!-- PHẦN CUỘN: BIỂU ĐỒ -->
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_marginTop="16dp" />
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:fillViewport="true"
+        android:layout_marginTop="12dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <!-- Biểu đồ tròn -->
+            <com.github.mikephil.charting.charts.PieChart
+                android:id="@+id/pieChart"
+                android:layout_width="match_parent"
+                android:layout_height="350dp"
+                android:layout_marginTop="8dp" />
+
+            <!-- Biểu đồ đường -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Dòng tiền (Thu/Chi)"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:textColor="@android:color/black"
+                android:layout_marginTop="24dp" />
+
+            <com.github.mikephil.charting.charts.LineChart
+                android:id="@+id/lineChart"
+                android:layout_width="match_parent"
+                android:layout_height="300dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="16dp" />
+
+        </LinearLayout>
+    </ScrollView>
 
 </LinearLayout>

@@ -10,6 +10,7 @@ import ht.nguyenhuutrong.fe_moneytrack_bot.models.Transaction;
 import ht.nguyenhuutrong.fe_moneytrack_bot.models.Wallet;
 import ht.nguyenhuutrong.fe_moneytrack_bot.models.ReportEntry;
 import ht.nguyenhuutrong.fe_moneytrack_bot.models.Budget;
+import ht.nguyenhuutrong.fe_moneytrack_bot.models.CashFlowEntry;
 
 import retrofit2.Call;
 import retrofit2.http.Body;
@@ -164,5 +165,12 @@ public interface ApiService {
             @Field("amount") double amount,
             @Field("month") int month,
             @Field("year") int year
+    );
+
+    @GET("api/reports/cashflow/")
+    Call<List<CashFlowEntry>> getCashFlowReport(
+            @Header("Authorization") String authToken,
+            @Query("start_date") String startDate,
+            @Query("end_date") String endDate
     );
 }
