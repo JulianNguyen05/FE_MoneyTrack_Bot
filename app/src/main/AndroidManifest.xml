@@ -17,9 +17,11 @@
         android:theme="@style/Theme.FE_MoneyTrack_Bot"
         tools:targetApi="31">
         <activity
-            android:name=".activities.ReportActivity"
+            android:name=".activities.BudgetActivity"
             android:exported="false" />
-        <!-- 🔹 Activity khởi động (Launcher) -->
+        <activity
+            android:name=".activities.ReportActivity"
+            android:exported="false" /> <!-- 🔹 Activity khởi động (Launcher) -->
         <activity
             android:name=".activities.LoginActivity"
             android:exported="true">

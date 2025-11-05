@@ -99,6 +99,15 @@
             android:text="Đăng xuất"
             android:textSize="12sp" />
 
+        <Button
+            android:id="@+id/buttonBudget"
+            style="?android:attr/buttonBarButtonStyle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Ngân sách"
+            android:textSize="12sp" />
+
     </LinearLayout>
 
     <!-- Tiêu đề giao dịch gần đây -->

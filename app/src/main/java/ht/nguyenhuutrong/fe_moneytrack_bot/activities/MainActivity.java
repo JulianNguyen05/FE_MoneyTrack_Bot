@@ -111,6 +111,13 @@ public class MainActivity extends AppCompatActivity implements TransactionAdapte
                     startActivity(new Intent(this, ReportActivity.class)));
         }
 
+        // Báo cáo (NEW)
+        Button buttonBudget = findViewById(R.id.buttonBudget);
+        if (buttonBudget != null) {
+            buttonBudget.setOnClickListener(v ->
+                    startActivity(new Intent(this, BudgetActivity.class)));
+        }
+
         // Nút Floating (+)
         FloatingActionButton fabAdd = findViewById(R.id.fab_add_transaction);
         fabAdd.setOnClickListener(v ->

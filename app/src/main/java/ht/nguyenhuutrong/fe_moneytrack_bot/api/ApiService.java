@@ -9,6 +9,7 @@ import ht.nguyenhuutrong.fe_moneytrack_bot.models.RegisterRequest;
 import ht.nguyenhuutrong.fe_moneytrack_bot.models.Transaction;
 import ht.nguyenhuutrong.fe_moneytrack_bot.models.Wallet;
 import ht.nguyenhuutrong.fe_moneytrack_bot.models.ReportEntry;
+import ht.nguyenhuutrong.fe_moneytrack_bot.models.Budget;
 
 import retrofit2.Call;
 import retrofit2.http.Body;
@@ -142,5 +143,26 @@ public interface ApiService {
             @Header("Authorization") String authToken,
             @Query("start_date") String startDate,
             @Query("end_date") String endDate
+    );
+
+    // --- THÊM HÀM MỚI CHO NGÂN SÁCH ---
+
+    // (1) Lấy danh sách ngân sách (cho tháng/năm)
+    @GET("api/budgets/")
+    Call<List<Budget>> getBudgets(
+            @Header("Authorization") String authToken,
+            @Query("month") int month,
+            @Query("year") int year
+    );
+
+    // (2) Tạo một ngân sách mới
+    @FormUrlEncoded
+    @POST("api/budgets/")
+    Call<Budget> createBudget(
+            @Header("Authorization") String authToken,
+            @Field("category") int categoryId,
+            @Field("amount") double amount,
+            @Field("month") int month,
+            @Field("year") int year
     );
 }

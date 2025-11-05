@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="16dp"
+    android:layout_marginBottom="8dp"
+    android:background="#FAFAFA">
+
+    <TextView
+        android:id="@+id/textViewCategoryName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Tên Danh mục"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:textColor="@color/black" />
+
+    <ProgressBar
+        android:id="@+id/progressBarBudget"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:max="100"
+        android:progress="75" />
+
+    <TextView
+        android:id="@+id/textViewBudgetProgress"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:text="Đã tiêu: 1.500.000 / 2.000.000 đ"
+        android:textSize="14sp" />
+
+    <TextView
+        android:id="@+id/textViewRemaining"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Còn lại: 500.000 đ"
+        android:textSize="14sp"
+        android:textStyle="italic" />
+
+</LinearLayout>
