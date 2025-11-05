@@ -31,6 +31,16 @@
         app:layout_constraintStart_toStartOf="@id/textViewTotalBalanceTitle"
         app:layout_constraintTop_toBottomOf="@id/textViewTotalBalanceTitle" />
 
+    <androidx.appcompat.widget.SearchView
+        android:id="@+id/searchView"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:iconifiedByDefault="false"
+        android:queryHint="Tìm theo mô tả (ví dụ: cà phê...)"
+        app:layout_constraintTop_toBottomOf="@+id/viewDivider"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
     <!-- Đường kẻ ngăn cách -->
     <View
         android:id="@+id/viewDivider"

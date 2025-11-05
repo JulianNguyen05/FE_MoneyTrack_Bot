@@ -44,7 +44,8 @@ public interface ApiService {
 
     @GET("api/transactions/")
     Call<List<Transaction>> getTransactions(
-            @Header("Authorization") String authToken
+            @Header("Authorization") String authToken,
+            @Query("search") String searchTerm
     );
 
     @FormUrlEncoded
