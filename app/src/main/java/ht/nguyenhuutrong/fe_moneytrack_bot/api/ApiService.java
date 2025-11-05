@@ -8,7 +8,7 @@ import ht.nguyenhuutrong.fe_moneytrack_bot.models.LoginResponse;
 import ht.nguyenhuutrong.fe_moneytrack_bot.models.RegisterRequest;
 import ht.nguyenhuutrong.fe_moneytrack_bot.models.Transaction;
 import ht.nguyenhuutrong.fe_moneytrack_bot.models.Wallet;
-import ht.nguyenhuutrong.fe_moneytrack_bot.models.ReportEntry; // ✅ Thêm dòng này
+import ht.nguyenhuutrong.fe_moneytrack_bot.models.ReportEntry;
 
 import retrofit2.Call;
 import retrofit2.http.Body;
@@ -21,7 +21,7 @@ import retrofit2.http.PATCH;
 import retrofit2.http.POST;
 import retrofit2.http.PUT;
 import retrofit2.http.Path;
-import retrofit2.http.Query; // ✅ Thêm dòng này
+import retrofit2.http.Query;
 
 public interface ApiService {
 
