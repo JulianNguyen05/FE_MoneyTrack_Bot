@@ -2,6 +2,7 @@ package ht.nguyenhuutrong.fe_moneytrack_bot.api;
 
 import java.util.List;
 
+// Import các model của bạn
 import ht.nguyenhuutrong.fe_moneytrack_bot.models.Category;
 import ht.nguyenhuutrong.fe_moneytrack_bot.models.LoginRequest;
 import ht.nguyenhuutrong.fe_moneytrack_bot.models.LoginResponse;
@@ -11,19 +12,23 @@ import ht.nguyenhuutrong.fe_moneytrack_bot.models.Wallet;
 import ht.nguyenhuutrong.fe_moneytrack_bot.models.ReportEntry;
 import ht.nguyenhuutrong.fe_moneytrack_bot.models.Budget;
 import ht.nguyenhuutrong.fe_moneytrack_bot.models.CashFlowEntry;
+import ht.nguyenhuutrong.fe_moneytrack_bot.models.User; // Cần import model User
+// (Import các model chatbot mới ở dưới)
+import ht.nguyenhuutrong.fe_moneytrack_bot.models.ChatbotRequest;
+import ht.nguyenhuutrong.fe_moneytrack_bot.models.ChatbotResponse;
+
 
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.DELETE;
-import retrofit2.http.Field;
-import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
 import retrofit2.http.Header;
-import retrofit2.http.PATCH;
 import retrofit2.http.POST;
 import retrofit2.http.PUT;
 import retrofit2.http.Path;
 import retrofit2.http.Query;
+import retrofit2.http.FormUrlEncoded; // Vẫn giữ cho API Transfer
+import retrofit2.http.Field;       // Vẫn giữ cho API Transfer
 
 public interface ApiService {
 
@@ -31,8 +36,9 @@ public interface ApiService {
     // 🧑 USER (Đăng ký / Đăng nhập)
     // ==========================================================
 
-    @POST("api/users/")
-    Call<Void> registerUser(@Body RegisterRequest registerRequest);
+    // SỬA LẠI: URL là "api/register/" và trả về "User"
+    @POST("api/register/")
+    Call<User> registerUser(@Body RegisterRequest registerRequest);
 
     @POST("api/token/")
     Call<LoginResponse> loginUser(@Body LoginRequest loginRequest);
@@ -48,15 +54,11 @@ public interface ApiService {
             @Query("search") String searchTerm
     );
 
-    @FormUrlEncoded
+    // SỬA LẠI: Dùng @Body thay vì @FormUrlEncoded
     @POST("api/transactions/")
     Call<Transaction> createTransaction(
             @Header("Authorization") String authToken,
-            @Field("amount") double amount,
-            @Field("description") String description,
-            @Field("date") String date,
-            @Field("category") int categoryId,
-            @Field("wallet") int walletId
+            @Body Transaction transaction // Gửi cả object Transaction (hoặc TransactionRequest)
     );
 
     @GET("api/transactions/{id}/")
@@ -65,16 +67,12 @@ public interface ApiService {
             @Path("id") int transactionId
     );
 
-    @FormUrlEncoded
+    // SỬA LẠI: Dùng @Body thay vì @FormUrlEncoded
     @PUT("api/transactions/{id}/")
     Call<Transaction> updateTransaction(
             @Header("Authorization") String authToken,
             @Path("id") int transactionId,
-            @Field("amount") double amount,
-            @Field("description") String description,
-            @Field("date") String date,
-            @Field("category") int categoryId,
-            @Field("wallet") int walletId
+            @Body Transaction transaction // Gửi cả object Transaction
     );
 
     @DELETE("api/transactions/{id}/")
@@ -93,12 +91,11 @@ public interface ApiService {
             @Header("Authorization") String authToken
     );
 
-    @FormUrlEncoded
+    // SỬA LẠI: Dùng @Body
     @POST("api/categories/")
     Call<Category> createCategory(
             @Header("Authorization") String authToken,
-            @Field("name") String name,
-            @Field("type") String type // "income" hoặc "expense"
+            @Body Category category
     );
 
 
@@ -111,12 +108,11 @@ public interface ApiService {
             @Header("Authorization") String authToken
     );
 
-    @FormUrlEncoded
+    // SỬA LẠI: Dùng @Body
     @POST("api/wallets/")
     Call<Wallet> createWallet(
             @Header("Authorization") String authToken,
-            @Field("name") String name,
-            @Field("balance") double balance
+            @Body Wallet wallet
     );
 
 
@@ -124,6 +120,7 @@ public interface ApiService {
     // 🔁 TRANSFER (Chuyển tiền giữa 2 ví)
     // ==========================================================
 
+    // Giữ nguyên @FormUrlEncoded vì đây là custom view
     @FormUrlEncoded
     @POST("api/transfer/")
     Call<Void> transferFunds(
@@ -137,7 +134,7 @@ public interface ApiService {
 
 
     // ==========================================================
-    // 📊 REPORT (Tổng hợp chi tiêu theo danh mục)
+    // 📊 REPORT & BUDGET
     // ==========================================================
 
     @GET("api/reports/summary/")
@@ -147,9 +144,6 @@ public interface ApiService {
             @Query("end_date") String endDate
     );
 
-    // --- THÊM HÀM MỚI CHO NGÂN SÁCH ---
-
-    // (1) Lấy danh sách ngân sách (cho tháng/năm)
     @GET("api/budgets/")
     Call<List<Budget>> getBudgets(
             @Header("Authorization") String authToken,
@@ -157,15 +151,11 @@ public interface ApiService {
             @Query("year") int year
     );
 
-    // (2) Tạo một ngân sách mới
-    @FormUrlEncoded
+    // SỬA LẠI: Dùng @Body
     @POST("api/budgets/")
     Call<Budget> createBudget(
             @Header("Authorization") String authToken,
-            @Field("category") int categoryId,
-            @Field("amount") double amount,
-            @Field("month") int month,
-            @Field("year") int year
+            @Body Budget budget
     );
 
     @GET("api/reports/cashflow/")
@@ -173,5 +163,16 @@ public interface ApiService {
             @Header("Authorization") String authToken,
             @Query("start_date") String startDate,
             @Query("end_date") String endDate
+    );
+
+
+    // ==========================================================
+    // 💬 CHATBOT (API BỊ THIẾU)
+    // ==========================================================
+
+    @POST("api/chatbot/")
+    Call<ChatbotResponse> postChatbotMessage(
+            @Header("Authorization") String authToken,
+            @Body ChatbotRequest request
     );
 }
