@@ -32,7 +32,7 @@ public class TransferActivity extends AppCompatActivity {
     private Button buttonSelectDate, buttonConfirmTransfer;
 
     private ApiService apiService;
-    private String authToken;
+    // private String authToken; // <-- SỬA LẠI: Xóa, Interceptor sẽ lo
     private TokenManager tokenManager;
 
     private List<Wallet> walletList = new ArrayList<>();
@@ -44,8 +44,10 @@ public class TransferActivity extends AppCompatActivity {
         setContentView(R.layout.activity_transfer);
 
         tokenManager = new TokenManager(this);
-        authToken = "Bearer " + tokenManager.getToken();
-        apiService = RetrofitClient.getClient().create(ApiService.class);
+        // authToken = "Bearer " + tokenManager.getToken(); // <-- SỬA LẠI: Xóa dòng này
+
+        // SỬA LẠI: Dùng getApiService(this) để có Context và Interceptor
+        apiService = RetrofitClient.getApiService(this);
 
         // Ánh xạ views
         spinnerFromWallet = findViewById(R.id.spinnerFromWallet);
@@ -65,7 +67,8 @@ public class TransferActivity extends AppCompatActivity {
     }
 
     private void loadWallets() {
-        apiService.getWallets(authToken).enqueue(new Callback<List<Wallet>>() {
+        // SỬA LẠI: Xóa authToken khỏi lời gọi hàm
+        apiService.getWallets().enqueue(new Callback<List<Wallet>>() {
             @Override
             public void onResponse(Call<List<Wallet>> call, Response<List<Wallet>> response) {
                 if (response.isSuccessful() && response.body() != null) {
@@ -110,6 +113,12 @@ public class TransferActivity extends AppCompatActivity {
         int fromPosition = spinnerFromWallet.getSelectedItemPosition();
         int toPosition = spinnerToWallet.getSelectedItemPosition();
 
+        // (Kiểm tra xem list có rỗng không)
+        if (walletList.isEmpty()) {
+            Toast.makeText(this, "Không có ví nào để chuyển", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
         if (fromPosition == toPosition) {
             Toast.makeText(this, "Ví nguồn và ví đích không được trùng nhau!", Toast.LENGTH_SHORT).show();
             return;
@@ -118,7 +127,8 @@ public class TransferActivity extends AppCompatActivity {
         int fromWalletId = walletList.get(fromPosition).getId();
         int toWalletId = walletList.get(toPosition).getId();
 
-        apiService.transferFunds(authToken, fromWalletId, toWalletId, amount, date, description)
+        // SỬA LẠI: Xóa authToken khỏi lời gọi hàm
+        apiService.transferFunds(fromWalletId, toWalletId, amount, date, description)
                 .enqueue(new Callback<Void>() {
                     @Override
                     public void onResponse(Call<Void> call, Response<Void> response) {
@@ -137,6 +147,7 @@ public class TransferActivity extends AppCompatActivity {
                 });
     }
 
+    // (Các hàm showDatePicker, updateDateButtonText, getSelectedDateString giữ nguyên)
     private void showDatePicker() {
         DatePickerDialog dialog = new DatePickerDialog(this, (view, year, month, day) -> {
             selectedDate.set(year, month, day);

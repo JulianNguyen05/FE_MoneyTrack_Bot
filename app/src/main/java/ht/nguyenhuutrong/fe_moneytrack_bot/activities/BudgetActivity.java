@@ -1,4 +1,3 @@
-// trong ht.nguyenhuutrong.fe_moneytrack_bot.activities/BudgetActivity.java
 package ht.nguyenhuutrong.fe_moneytrack_bot.activities;
 
 import android.app.AlertDialog;
@@ -46,7 +45,7 @@ public class BudgetActivity extends AppCompatActivity {
     private FloatingActionButton fabAddBudget;
 
     private ApiService apiService;
-    private String authToken;
+    // private String authToken; // <-- SỬA LẠI: Không cần nữa
     private TokenManager tokenManager;
 
     // Dữ liệu
@@ -69,8 +68,11 @@ public class BudgetActivity extends AppCompatActivity {
 
         // Khởi tạo API
         tokenManager = new TokenManager(this);
-        authToken = "Bearer " + tokenManager.getToken();
-        apiService = RetrofitClient.getClient().create(ApiService.class);
+        // authToken = "Bearer " + tokenManager.getToken(); // <-- SỬA LẠI: Xóa dòng này
+
+        // SỬA LẠI: Dùng getApiService(this) để Retrofit có Context
+        // và tự động đính kèm Token qua Interceptor
+        apiService = RetrofitClient.getApiService(this);
 
         // Ánh xạ View
         textViewCurrentMonth = findViewById(R.id.textViewCurrentMonth);
@@ -95,26 +97,24 @@ public class BudgetActivity extends AppCompatActivity {
     }
 
     private void setupRecyclerView() {
-        // Khởi tạo adapter với 1 danh sách rỗng
         adapter = new BudgetAdapter(new ArrayList<>());
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(adapter);
     }
 
     // --- (1) HÀM TẢI DỮ LIỆU CHÍNH ---
-    // Bắt đầu chuỗi API call: Lấy Ngân sách -> Lấy Chi tiêu
     private void loadAllData() {
         loadBudgets();
     }
 
     // --- (2) TẢI DANH SÁCH NGÂN SÁCH ---
     private void loadBudgets() {
-        apiService.getBudgets(authToken, currentMonth, currentYear).enqueue(new Callback<List<Budget>>() {
+        // SỬA LẠI: Xóa 'authToken' khỏi lời gọi hàm
+        apiService.getBudgets(currentMonth, currentYear).enqueue(new Callback<List<Budget>>() {
             @Override
             public void onResponse(Call<List<Budget>> call, Response<List<Budget>> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     budgetList = response.body();
-                    // Sau khi lấy Ngân sách thành công, lấy Báo cáo Chi tiêu
                     loadSpendingReport();
                 } else {
                     Toast.makeText(BudgetActivity.this, "Không thể tải Ngân sách", Toast.LENGTH_SHORT).show();
@@ -128,29 +128,20 @@ public class BudgetActivity extends AppCompatActivity {
     }
 
     // --- (3) TẢI BÁO CÁO CHI TIÊU ---
-    // --- (3) TẢI BÁO CÁO CHI TIÊU ---
     private void loadSpendingReport() {
-        // Lấy báo cáo cho tháng/năm hiện tại
         String startDate = String.format(Locale.US, "%d-%02d-01", currentYear, currentMonth);
 
-        // --- 💡 FIX LỖI "31" TẠI ĐÂY ---
-        // 1. Tạo 1 calendar
         Calendar calendar = Calendar.getInstance();
-        // 2. Set năm và tháng (LƯU Ý: Calendar.MONTH bắt đầu từ 0, nên phải -1)
         calendar.set(currentYear, currentMonth - 1, 1);
-        // 3. Lấy ngày CUỐI CÙNG thực tế của tháng đó
         int lastDayOfMonth = calendar.getActualMaximum(Calendar.DAY_OF_MONTH);
-
-        // 4. Tạo endDate chính xác (ví dụ: 2025-11-30)
         String endDate = String.format(Locale.US, "%d-%02d-%d", currentYear, currentMonth, lastDayOfMonth);
-        // --- (Kết thúc fix) ---
 
-        apiService.getReportSummary(authToken, startDate, endDate).enqueue(new Callback<List<ReportEntry>>() {
+        // SỬA LẠI: Xóa 'authToken' khỏi lời gọi hàm
+        apiService.getReportSummary(startDate, endDate).enqueue(new Callback<List<ReportEntry>>() {
             @Override
             public void onResponse(Call<List<ReportEntry>> call, Response<List<ReportEntry>> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     reportList = response.body();
-                    // Đã có cả 2 danh sách -> Gộp chúng lại
                     mergeDataAndUpdateAdapter();
                 } else {
                     Toast.makeText(BudgetActivity.this, "Không thể tải Báo cáo", Toast.LENGTH_SHORT).show();
@@ -165,41 +156,35 @@ public class BudgetActivity extends AppCompatActivity {
 
     // --- (4) GỘP (MERGE) DỮ LIỆU ---
     private void mergeDataAndUpdateAdapter() {
-        // Dùng Map để tra cứu chi tiêu (spentAmount) nhanh hơn
+        // (Hàm này đã đúng, giữ nguyên)
         Map<String, Double> spendingMap = new HashMap<>();
         for (ReportEntry entry : reportList) {
             spendingMap.put(entry.getCategoryName(), entry.getTotalAmount());
         }
 
-        // Tạo danh sách BudgetStatus mới
         List<BudgetAdapter.BudgetStatus> statusList = new ArrayList<>();
 
         for (Budget budget : budgetList) {
             String categoryName = budget.getCategoryDetails().getName();
-
-            // Lấy số tiền đã tiêu, nếu không có thì là 0
             double spentAmount = spendingMap.getOrDefault(categoryName, 0.0);
-
-            // Thêm vào danh sách
             statusList.add(new BudgetAdapter.BudgetStatus(budget, spentAmount));
         }
 
-        // Cập nhật Adapter
         adapter.setData(statusList);
     }
 
     // --- (5) HIỂN THỊ HỘP THOẠI THÊM NGÂN SÁCH ---
     private void showAddBudgetDialog() {
+        // (Hàm này đã đúng, giữ nguyên)
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         LayoutInflater inflater = getLayoutInflater();
-        View dialogView = inflater.inflate(R.layout.dialog_add_budget, null); // Tạo file layout mới
+        View dialogView = inflater.inflate(R.layout.dialog_add_budget, null);
         builder.setView(dialogView);
 
         Spinner spinnerCategory = dialogView.findViewById(R.id.spinnerCategoryBudget);
         EditText editTextAmount = dialogView.findViewById(R.id.editTextAmountBudget);
         Button buttonSave = dialogView.findViewById(R.id.buttonSaveBudget);
 
-        // Tải danh sách danh mục (CHỈ DANH MỤC CHI)
         loadCategoriesForSpinner(spinnerCategory);
 
         AlertDialog dialog = builder.create();
@@ -214,7 +199,11 @@ public class BudgetActivity extends AppCompatActivity {
             double amount = Double.parseDouble(amountStr);
             Category selectedCategory = (Category) spinnerCategory.getSelectedItem();
 
-            // Gọi API tạo
+            if (selectedCategory == null) {
+                Toast.makeText(this, "Chưa chọn danh mục", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
             createBudget(selectedCategory.getId(), amount, dialog);
         });
 
@@ -223,27 +212,25 @@ public class BudgetActivity extends AppCompatActivity {
 
     // (6) Hàm phụ 1: Tải Category cho Spinner (trong Dialog)
     private void loadCategoriesForSpinner(Spinner spinnerCategory) {
-        apiService.getCategories(authToken).enqueue(new Callback<List<Category>>() {
+        // SỬA LẠI: Xóa 'authToken' khỏi lời gọi hàm
+        apiService.getCategories().enqueue(new Callback<List<Category>>() {
             @Override
             public void onResponse(Call<List<Category>> call, Response<List<Category>> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     List<Category> expenseCategories = new ArrayList<>();
-                    List<String> categoryNames = new ArrayList<>();
 
                     for (Category c : response.body()) {
-                        if ("expense".equals(c.getType())) { // Chỉ lọc danh mục CHI
+                        if ("expense".equals(c.getType())) {
                             expenseCategories.add(c);
-                            categoryNames.add(c.getName());
                         }
                     }
 
-                    // Dùng Adapter riêng để có thể lấy Object Category
+                    // (Phần adapter ghi đè của bạn rất tốt, giữ nguyên)
                     ArrayAdapter<Category> adapter = new ArrayAdapter<Category>(
                             BudgetActivity.this,
                             android.R.layout.simple_spinner_item,
                             expenseCategories
                     ) {
-                        // Ghi đè để hiển thị tên
                         @Override
                         public View getView(int position, View convertView, ViewGroup parent) {
                             TextView view = (TextView) super.getView(position, convertView, parent);
@@ -268,7 +255,18 @@ public class BudgetActivity extends AppCompatActivity {
 
     // (7) Hàm phụ 2: Gọi API Tạo Ngân sách
     private void createBudget(int categoryId, double amount, AlertDialog dialog) {
-        apiService.createBudget(authToken, categoryId, amount, currentMonth, currentYear)
+
+        // SỬA LẠI: Gửi một Budget object, không gửi 5 trường riêng lẻ
+
+        // 1. Tạo một Budget object
+        Budget newBudget = new Budget();
+        newBudget.setCategory(categoryId); // Giả định model Budget dùng setCategory(int id)
+        newBudget.setAmount(amount);
+        newBudget.setMonth(currentMonth);
+        newBudget.setYear(currentYear);
+
+        // 2. Gửi object đó bằng @Body
+        apiService.createBudget(newBudget)
                 .enqueue(new Callback<Budget>() {
                     @Override
                     public void onResponse(Call<Budget> call, Response<Budget> response) {

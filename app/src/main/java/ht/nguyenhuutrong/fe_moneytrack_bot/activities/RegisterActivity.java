@@ -36,7 +36,9 @@ public class RegisterActivity extends AppCompatActivity {
         editTextPassword = findViewById(R.id.editTextPasswordRegister);
         buttonRegister = findViewById(R.id.buttonRegister);
 
-        apiService = RetrofitClient.getClient().create(ApiService.class);
+        // SỬA LẠI: Dùng getApiService(this) để nhất quán
+        // và để Retrofit có Context (dù API này không cần token)
+        apiService = RetrofitClient.getApiService(this);
 
         buttonRegister.setOnClickListener(v -> registerUser());
     }
@@ -60,7 +62,6 @@ public class RegisterActivity extends AppCompatActivity {
         }
 
         // 6. THÊM EMAIL (vào request)
-        // Lưu ý: Bạn phải cập nhật file RegisterRequest.java để nó nhận email
         RegisterRequest registerRequest = new RegisterRequest(username, email, password);
 
         // API của bạn trả về User object, không phải Void

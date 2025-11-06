@@ -40,7 +40,7 @@ public class LoginActivity extends AppCompatActivity {
         textViewRegister = findViewById(R.id.textViewRegister);
 
         // Khởi tạo API & Token
-        apiService = RetrofitClient.getClient().create(ApiService.class);
+        apiService = RetrofitClient.getClient(this).create(ApiService.class);
         tokenManager = new TokenManager(this);
 
         // Nếu đã có token thì vào thẳng MainActivity

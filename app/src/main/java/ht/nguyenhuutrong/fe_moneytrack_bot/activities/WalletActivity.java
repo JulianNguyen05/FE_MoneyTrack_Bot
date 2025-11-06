@@ -9,6 +9,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+// SỬA LẠI: Cần ArrayList để khởi tạo adapter
+import java.util.ArrayList;
 import java.util.List;
 
 import ht.nguyenhuutrong.fe_moneytrack_bot.R;
@@ -27,7 +29,7 @@ public class WalletActivity extends AppCompatActivity {
     private WalletAdapter adapter;
     private ApiService apiService;
     private TokenManager tokenManager;
-    private String authToken;
+    // private String authToken; // <-- SỬA LẠI: Xóa, Interceptor sẽ lo
 
     private EditText editTextWalletName;
     private EditText editTextInitialBalance;
@@ -39,8 +41,10 @@ public class WalletActivity extends AppCompatActivity {
         setContentView(R.layout.activity_wallet);
 
         tokenManager = new TokenManager(this);
-        authToken = "Bearer " + tokenManager.getToken();
-        apiService = RetrofitClient.getClient().create(ApiService.class);
+        // authToken = "Bearer " + tokenManager.getToken(); // <-- SỬA LẠI: Xóa
+
+        // SỬA LẠI: Dùng getApiService(this) để có Context và Interceptor
+        apiService = RetrofitClient.getApiService(this);
 
         setupViews();
         setupRecyclerView();
@@ -58,12 +62,16 @@ public class WalletActivity extends AppCompatActivity {
     private void setupRecyclerView() {
         recyclerView = findViewById(R.id.recyclerViewWallets);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
+
+        // SỬA LẠI: Khởi tạo adapter với danh sách rỗng (nếu WalletAdapter của bạn yêu cầu)
+        // Nếu adapter của bạn có constructor rỗng thì `new WalletAdapter()` là OK.
         adapter = new WalletAdapter();
         recyclerView.setAdapter(adapter);
     }
 
     private void loadWallets() {
-        apiService.getWallets(authToken).enqueue(new Callback<List<Wallet>>() {
+        // SỬA LẠI: Xóa authToken khỏi lời gọi hàm
+        apiService.getWallets().enqueue(new Callback<List<Wallet>>() {
             @Override
             public void onResponse(Call<List<Wallet>> call, Response<List<Wallet>> response) {
                 if (response.isSuccessful() && response.body() != null) {
@@ -97,14 +105,22 @@ public class WalletActivity extends AppCompatActivity {
             return;
         }
 
-        apiService.createWallet(authToken, name, balance).enqueue(new Callback<Wallet>() {
+        // --- SỬA LẠI: Gửi một Wallet object, không gửi 3 trường riêng lẻ ---
+
+        // 1. Tạo một Wallet object
+        Wallet newWallet = new Wallet();
+        newWallet.setName(name);
+        newWallet.setBalance(balance); // Giả định model Wallet dùng setBalance(double)
+
+        // 2. Gửi object đó bằng @Body
+        apiService.createWallet(newWallet).enqueue(new Callback<Wallet>() {
             @Override
             public void onResponse(Call<Wallet> call, Response<Wallet> response) {
                 if (response.isSuccessful()) {
                     Toast.makeText(WalletActivity.this, "Đã thêm ví!", Toast.LENGTH_SHORT).show();
                     editTextWalletName.setText("");
                     editTextInitialBalance.setText("");
-                    loadWallets();
+                    loadWallets(); // Tải lại danh sách
                 } else {
                     Toast.makeText(WalletActivity.this, "Thêm thất bại", Toast.LENGTH_SHORT).show();
                 }

@@ -50,34 +50,29 @@ public interface ApiService {
 
     @GET("api/transactions/")
     Call<List<Transaction>> getTransactions(
-            @Header("Authorization") String authToken,
             @Query("search") String searchTerm
     );
 
     // SỬA LẠI: Dùng @Body thay vì @FormUrlEncoded
     @POST("api/transactions/")
     Call<Transaction> createTransaction(
-            @Header("Authorization") String authToken,
-            @Body Transaction transaction // Gửi cả object Transaction (hoặc TransactionRequest)
+            @Body Transaction transaction
     );
 
     @GET("api/transactions/{id}/")
     Call<Transaction> getTransactionDetails(
-            @Header("Authorization") String authToken,
             @Path("id") int transactionId
     );
 
     // SỬA LẠI: Dùng @Body thay vì @FormUrlEncoded
     @PUT("api/transactions/{id}/")
     Call<Transaction> updateTransaction(
-            @Header("Authorization") String authToken,
             @Path("id") int transactionId,
             @Body Transaction transaction // Gửi cả object Transaction
     );
 
     @DELETE("api/transactions/{id}/")
     Call<Void> deleteTransaction(
-            @Header("Authorization") String authToken,
             @Path("id") int transactionId
     );
 
@@ -88,13 +83,11 @@ public interface ApiService {
 
     @GET("api/categories/")
     Call<List<Category>> getCategories(
-            @Header("Authorization") String authToken
     );
 
     // SỬA LẠI: Dùng @Body
     @POST("api/categories/")
     Call<Category> createCategory(
-            @Header("Authorization") String authToken,
             @Body Category category
     );
 
@@ -105,13 +98,11 @@ public interface ApiService {
 
     @GET("api/wallets/")
     Call<List<Wallet>> getWallets(
-            @Header("Authorization") String authToken
     );
 
     // SỬA LẠI: Dùng @Body
     @POST("api/wallets/")
     Call<Wallet> createWallet(
-            @Header("Authorization") String authToken,
             @Body Wallet wallet
     );
 
@@ -124,7 +115,6 @@ public interface ApiService {
     @FormUrlEncoded
     @POST("api/transfer/")
     Call<Void> transferFunds(
-            @Header("Authorization") String authToken,
             @Field("from_wallet_id") int fromWalletId,
             @Field("to_wallet_id") int toWalletId,
             @Field("amount") double amount,
@@ -139,14 +129,12 @@ public interface ApiService {
 
     @GET("api/reports/summary/")
     Call<List<ReportEntry>> getReportSummary(
-            @Header("Authorization") String authToken,
             @Query("start_date") String startDate,
             @Query("end_date") String endDate
     );
 
     @GET("api/budgets/")
     Call<List<Budget>> getBudgets(
-            @Header("Authorization") String authToken,
             @Query("month") int month,
             @Query("year") int year
     );
@@ -154,13 +142,11 @@ public interface ApiService {
     // SỬA LẠI: Dùng @Body
     @POST("api/budgets/")
     Call<Budget> createBudget(
-            @Header("Authorization") String authToken,
             @Body Budget budget
     );
 
     @GET("api/reports/cashflow/")
     Call<List<CashFlowEntry>> getCashFlowReport(
-            @Header("Authorization") String authToken,
             @Query("start_date") String startDate,
             @Query("end_date") String endDate
     );
@@ -172,7 +158,6 @@ public interface ApiService {
 
     @POST("api/chatbot/")
     Call<ChatbotResponse> postChatbotMessage(
-            @Header("Authorization") String authToken,
             @Body ChatbotRequest request
     );
 }

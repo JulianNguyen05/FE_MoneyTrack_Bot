@@ -47,7 +47,7 @@ public class ReportActivity extends AppCompatActivity {
     private PieChart pieChart;
     private LineChart lineChart; // <-- (3) THÊM BIẾN MỚI
     private ApiService apiService;
-    private String authToken;
+    // private String authToken; // <-- SỬA LẠI: Xóa, Interceptor sẽ lo
     private TokenManager tokenManager;
 
     // Biến cho Lọc ngày (giữ nguyên)
@@ -76,8 +76,10 @@ public class ReportActivity extends AppCompatActivity {
             return;
         }
 
-        authToken = "Bearer " + token;
-        apiService = RetrofitClient.getClient().create(ApiService.class);
+        // authToken = "Bearer " + token; // <-- SỬA LẠI: Xóa dòng này
+
+        // SỬA LẠI: Dùng getApiService(this) để có Context và Interceptor
+        apiService = RetrofitClient.getApiService(this);
 
         // Cài đặt ngày mặc định
         endDate.setTime(Calendar.getInstance().getTime());
@@ -88,7 +90,6 @@ public class ReportActivity extends AppCompatActivity {
         // --- (5) SỬA LẠI SỰ KIỆN NÚT LỌC ---
         buttonStartDate.setOnClickListener(v -> showDatePicker(true));
         buttonEndDate.setOnClickListener(v -> showDatePicker(false));
-        // Khi nhấn Lọc, tải CẢ HAI biểu đồ
         buttonFilter.setOnClickListener(v -> loadAllCharts());
         // ------------------------------------
 
@@ -127,19 +128,18 @@ public class ReportActivity extends AppCompatActivity {
     }
 
     // --- (8) HÀM TẢI DỮ LIỆU MỚI ---
-    // Hàm này sẽ gọi cả hai hàm tải dữ liệu con
     private void loadAllCharts() {
         loadPieChartData();
         loadCashFlowData();
     }
 
     // --- (9) ĐỔI TÊN HÀM TẢI PIE CHART ---
-    // (Tên cũ: loadReportData)
     private void loadPieChartData() {
         String start = getFormattedDate(startDate);
         String end = getFormattedDate(endDate);
 
-        apiService.getReportSummary(authToken, start, end).enqueue(new Callback<List<ReportEntry>>() {
+        // SỬA LẠI: Xóa authToken
+        apiService.getReportSummary(start, end).enqueue(new Callback<List<ReportEntry>>() {
             @Override
             public void onResponse(Call<List<ReportEntry>> call, Response<List<ReportEntry>> response) {
                 if (response.isSuccessful() && response.body() != null) {
@@ -169,7 +169,8 @@ public class ReportActivity extends AppCompatActivity {
         String start = getFormattedDate(startDate);
         String end = getFormattedDate(endDate);
 
-        apiService.getCashFlowReport(authToken, start, end).enqueue(new Callback<List<CashFlowEntry>>() {
+        // SỬA LẠI: Xóa authToken
+        apiService.getCashFlowReport(start, end).enqueue(new Callback<List<CashFlowEntry>>() {
             @Override
             public void onResponse(Call<List<CashFlowEntry>> call, Response<List<CashFlowEntry>> response) {
                 if (response.isSuccessful() && response.body() != null) {
@@ -251,6 +252,7 @@ public class ReportActivity extends AppCompatActivity {
 
     // --- (11) HÀM MỚI: SETUP LINE CHART ---
     private void setupLineChart() {
+        // (Giữ nguyên)
         lineChart.getDescription().setEnabled(false);
         lineChart.setDrawGridBackground(false);
         lineChart.setTouchEnabled(true);
@@ -258,66 +260,57 @@ public class ReportActivity extends AppCompatActivity {
         lineChart.setScaleEnabled(true);
         lineChart.setPinchZoom(true);
 
-        // Cấu hình trục X (Trục Ngày)
         XAxis xAxis = lineChart.getXAxis();
         xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
-        xAxis.setGranularity(1f); // Chỉ hiển thị các giá trị nguyên (0, 1, 2...)
+        xAxis.setGranularity(1f);
         xAxis.setAvoidFirstLastClipping(true);
 
-        // Tắt trục Y bên phải
         lineChart.getAxisRight().setEnabled(false);
     }
 
     // --- (12) HÀM MỚI: POPULATE LINE CHART ---
     private void populateLineChart(List<CashFlowEntry> data) {
+        // (Giữ nguyên)
         ArrayList<Entry> incomeEntries = new ArrayList<>();
         ArrayList<Entry> expenseEntries = new ArrayList<>();
-        ArrayList<String> dateLabels = new ArrayList<>(); // Danh sách nhãn ngày
+        ArrayList<String> dateLabels = new ArrayList<>();
 
-        // Lặp qua dữ liệu API trả về
         for (int i = 0; i < data.size(); i++) {
             CashFlowEntry entry = data.get(i);
-
-            // Thêm dữ liệu Thu/Chi vào 2 danh sách
             incomeEntries.add(new Entry(i, (float) entry.getTotalIncome()));
             expenseEntries.add(new Entry(i, (float) entry.getTotalExpense()));
-
-            // Lưu lại nhãn ngày (ví dụ: "2025-11-05")
             dateLabels.add(entry.getDay());
         }
 
-        // Cấu hình đường "Tổng Thu" (Màu xanh)
         LineDataSet incomeSet = new LineDataSet(incomeEntries, "Tổng Thu");
-        incomeSet.setColor(Color.parseColor("#4CAF50")); // Màu xanh lá
+        incomeSet.setColor(Color.parseColor("#4CAF50"));
         incomeSet.setCircleColor(Color.parseColor("#4CAF50"));
         incomeSet.setLineWidth(2f);
         incomeSet.setCircleRadius(3f);
-        incomeSet.setDrawValues(false); // Ẩn số tiền trên điểm
+        incomeSet.setDrawValues(false);
 
-        // Cấu hình đường "Tổng Chi" (Màu đỏ)
         LineDataSet expenseSet = new LineDataSet(expenseEntries, "Tổng Chi");
-        expenseSet.setColor(Color.parseColor("#F44336")); // Màu đỏ
+        expenseSet.setColor(Color.parseColor("#F44336"));
         expenseSet.setCircleColor(Color.parseColor("#F44336"));
         expenseSet.setLineWidth(2f);
         expenseSet.setCircleRadius(3f);
         expenseSet.setDrawValues(false);
 
-        // Gán bộ định dạng ngày (DateAxisFormatter) cho trục X
         XAxis xAxis = lineChart.getXAxis();
         xAxis.setValueFormatter(new DateAxisFormatter(dateLabels));
 
-        // Tạo dữ liệu và gán vào biểu đồ
         LineData lineData = new LineData(incomeSet, expenseSet);
         lineChart.setData(lineData);
-        lineChart.animateX(1000); // Hiệu ứng
-        lineChart.invalidate(); // Vẽ lại
+        lineChart.animateX(1000);
+        lineChart.invalidate();
     }
 
     // --- (13) LỚP NỘI BỘ (INNER CLASS) ĐỂ ĐỊNH DẠNG NGÀY TRỤC X ---
     private class DateAxisFormatter extends ValueFormatter {
+        // (Giữ nguyên)
         private final List<String> labels;
         private SimpleDateFormat parser = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
-        private SimpleDateFormat formatter = new SimpleDateFormat("dd/MM", Locale.getDefault()); // Định dạng "Ngày/Tháng"
+        private SimpleDateFormat formatter = new SimpleDateFormat("dd/MM", Locale.getDefault());
 
         public DateAxisFormatter(List<String> labels) {
             this.labels = labels;
@@ -325,17 +318,15 @@ public class ReportActivity extends AppCompatActivity {
 
         @Override
         public String getAxisLabel(float value, AxisBase axis) {
-            int index = (int) value; // Lấy chỉ số (0, 1, 2...)
-            // Đảm bảo chỉ số nằm trong phạm vi
+            int index = (int) value;
             if (index >= 0 && index < labels.size()) {
                 try {
-                    // Chuyển "YYYY-MM-DD" thành "DD/MM"
                     return formatter.format(parser.parse(labels.get(index)));
                 } catch (ParseException e) {
-                    return labels.get(index); // Nếu lỗi, trả về chuỗi gốc
+                    return labels.get(index);
                 }
             }
-            return ""; // Trả về rỗng nếu ngoài phạm vi
+            return "";
         }
     }
 }

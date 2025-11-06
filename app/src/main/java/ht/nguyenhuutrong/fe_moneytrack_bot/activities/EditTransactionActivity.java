@@ -37,7 +37,7 @@ public class EditTransactionActivity extends AppCompatActivity {
     private TextView textViewTitle;
 
     private ApiService apiService;
-    private String authToken;
+    // private String authToken; // <-- SỬA LẠI: Xóa, Interceptor sẽ lo
     private TokenManager tokenManager;
 
     private List<Category> categoryList = new ArrayList<>();
@@ -51,7 +51,6 @@ public class EditTransactionActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_transaction_form);
 
-        // ✅ Nhận ID giao dịch từ Intent
         transactionId = getIntent().getIntExtra("TRANSACTION_ID", -1);
         if (transactionId == -1) {
             Toast.makeText(this, "Lỗi: Không tìm thấy giao dịch", Toast.LENGTH_SHORT).show();
@@ -67,8 +66,11 @@ public class EditTransactionActivity extends AppCompatActivity {
             finish();
             return;
         }
-        authToken = "Bearer " + token;
-        apiService = RetrofitClient.getClient().create(ApiService.class);
+
+        // authToken = "Bearer " + token; // <-- SỬA LẠI: Xóa dòng này
+
+        // SỬA LẠI: Dùng getApiService(this) để có Context và Interceptor
+        apiService = RetrofitClient.getApiService(this);
 
         // ✅ Ánh xạ View
         textViewTitle = findViewById(R.id.textViewTitle);
@@ -93,7 +95,8 @@ public class EditTransactionActivity extends AppCompatActivity {
 
     // --- Tải danh mục ---
     private void loadCategories() {
-        apiService.getCategories(authToken).enqueue(new Callback<List<Category>>() {
+        // SỬA LẠI: Xóa authToken
+        apiService.getCategories().enqueue(new Callback<List<Category>>() {
             @Override
             public void onResponse(Call<List<Category>> call, Response<List<Category>> response) {
                 if (response.isSuccessful() && response.body() != null) {
@@ -109,7 +112,6 @@ public class EditTransactionActivity extends AppCompatActivity {
                     adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                     spinnerCategory.setAdapter(adapter);
 
-                    // Sau khi tải category → tải ví
                     loadWallets();
                 } else {
                     Toast.makeText(EditTransactionActivity.this, "Không thể tải danh mục", Toast.LENGTH_SHORT).show();
@@ -125,7 +127,8 @@ public class EditTransactionActivity extends AppCompatActivity {
 
     // --- Tải ví ---
     private void loadWallets() {
-        apiService.getWallets(authToken).enqueue(new Callback<List<Wallet>>() {
+        // SỬA LẠI: Xóa authToken
+        apiService.getWallets().enqueue(new Callback<List<Wallet>>() {
             @Override
             public void onResponse(Call<List<Wallet>> call, Response<List<Wallet>> response) {
                 if (response.isSuccessful() && response.body() != null) {
@@ -141,7 +144,6 @@ public class EditTransactionActivity extends AppCompatActivity {
                     adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                     spinnerWallet.setAdapter(adapter);
 
-                    // Sau khi có cả category & wallet → tải chi tiết giao dịch
                     loadTransactionDetails();
                 } else {
                     Toast.makeText(EditTransactionActivity.this, "Không thể tải ví", Toast.LENGTH_SHORT).show();
@@ -157,7 +159,8 @@ public class EditTransactionActivity extends AppCompatActivity {
 
     // --- Tải chi tiết giao dịch ---
     private void loadTransactionDetails() {
-        apiService.getTransactionDetails(authToken, transactionId).enqueue(new Callback<Transaction>() {
+        // SỬA LẠI: Xóa authToken
+        apiService.getTransactionDetails(transactionId).enqueue(new Callback<Transaction>() {
             @Override
             public void onResponse(Call<Transaction> call, Response<Transaction> response) {
                 if (response.isSuccessful() && response.body() != null) {
@@ -174,12 +177,11 @@ public class EditTransactionActivity extends AppCompatActivity {
         });
     }
 
-    // --- Điền dữ liệu cũ ---
+    // --- Điền dữ liệu cũ (Giữ nguyên) ---
     private void prefillForm(Transaction t) {
         editTextAmount.setText(String.valueOf(t.getAmount()));
         editTextDescription.setText(t.getDescription());
 
-        // Ngày
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
         try {
             selectedDate.setTime(sdf.parse(t.getDate()));
@@ -188,7 +190,6 @@ public class EditTransactionActivity extends AppCompatActivity {
             e.printStackTrace();
         }
 
-        // Spinner
         spinnerCategory.setSelection(findCategoryIndex(t.getCategory()));
         spinnerWallet.setSelection(findWalletIndex(t.getWallet()));
     }
@@ -207,7 +208,7 @@ public class EditTransactionActivity extends AppCompatActivity {
         return 0;
     }
 
-    // --- Hiển thị chọn ngày ---
+    // --- Hiển thị chọn ngày (Giữ nguyên) ---
     private void showDatePicker() {
         DatePickerDialog dialog = new DatePickerDialog(
                 this,
@@ -250,7 +251,18 @@ public class EditTransactionActivity extends AppCompatActivity {
         int categoryId = categoryList.get(categoryIndex).getId();
         int walletId = walletList.get(walletIndex).getId();
 
-        apiService.updateTransaction(authToken, transactionId, amount, description, date, categoryId, walletId)
+        // --- SỬA LẠI: Gửi một Transaction object, không gửi 7 trường riêng lẻ ---
+
+        // 1. Tạo một Transaction object
+        Transaction transactionToUpdate = new Transaction();
+        transactionToUpdate.setAmount(amount);
+        transactionToUpdate.setDescription(description);
+        transactionToUpdate.setDate(date);
+        transactionToUpdate.setCategory(categoryId); // Giả định model Transaction dùng setCategory(int id)
+        transactionToUpdate.setWallet(walletId);     // Giả định model Transaction dùng setWallet(int id)
+
+        // 2. Gửi object đó bằng @Body
+        apiService.updateTransaction(transactionId, transactionToUpdate)
                 .enqueue(new Callback<Transaction>() {
                     @Override
                     public void onResponse(Call<Transaction> call, Response<Transaction> response) {

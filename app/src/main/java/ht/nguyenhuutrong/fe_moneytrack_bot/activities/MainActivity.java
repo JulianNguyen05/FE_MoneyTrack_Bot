@@ -71,7 +71,7 @@ public class MainActivity extends AppCompatActivity implements TransactionAdapte
         adapter = new TransactionAdapter(new ArrayList<>(), this);
         recyclerView.setAdapter(adapter);
 
-        apiService = RetrofitClient.getClient().create(ApiService.class);
+        apiService = RetrofitClient.getApiService(this);
 
         setupButtons();
         setupSearchListener(); // <-- (4) GỌI HÀM LẮNG NGHE MỚI
@@ -154,7 +154,7 @@ public class MainActivity extends AppCompatActivity implements TransactionAdapte
     // --- Tải tổng số dư ---
     private void loadDashboardData() {
         // (Hàm này giữ nguyên, không thay đổi)
-        apiService.getWallets(authToken).enqueue(new Callback<List<Wallet>>() {
+        apiService.getWallets().enqueue(new Callback<List<Wallet>>() {
             @Override
             public void onResponse(Call<List<Wallet>> call, Response<List<Wallet>> response) {
                 if (response.isSuccessful() && response.body() != null) {
@@ -181,7 +181,7 @@ public class MainActivity extends AppCompatActivity implements TransactionAdapte
     // (Thêm tham số @Nullable String searchTerm)
     private void loadTransactions(@Nullable String searchTerm) {
         // Gọi API với tham số tìm kiếm (có thể là null)
-        apiService.getTransactions(authToken, searchTerm).enqueue(new Callback<List<Transaction>>() {
+        apiService.getTransactions(searchTerm).enqueue(new Callback<List<Transaction>>() {
             @Override
             public void onResponse(Call<List<Transaction>> call, Response<List<Transaction>> response) {
                 if (response.isSuccessful() && response.body() != null) {
@@ -227,7 +227,7 @@ public class MainActivity extends AppCompatActivity implements TransactionAdapte
 
     // --- API Xóa giao dịch ---
     private void deleteTransaction(int transactionId) {
-        apiService.deleteTransaction(authToken, transactionId).enqueue(new Callback<Void>() {
+        apiService.deleteTransaction(transactionId).enqueue(new Callback<Void>() {
             @Override
             public void onResponse(Call<Void> call, Response<Void> response) {
                 if (response.isSuccessful()) {

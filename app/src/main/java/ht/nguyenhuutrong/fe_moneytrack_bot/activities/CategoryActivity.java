@@ -31,7 +31,7 @@ public class CategoryActivity extends AppCompatActivity {
     private CategoryAdapter adapter;
     private ApiService apiService;
     private TokenManager tokenManager;
-    private String authToken;
+    // private String authToken; // <-- SỬA LẠI: Xóa, Interceptor sẽ lo
 
     private EditText editTextCategoryName;
     private RadioGroup radioGroupCategoryType;
@@ -51,8 +51,10 @@ public class CategoryActivity extends AppCompatActivity {
             return;
         }
 
-        authToken = "Bearer " + token;
-        apiService = RetrofitClient.getClient().create(ApiService.class);
+        // authToken = "Bearer " + token; // <-- SỬA LẠI: Xóa
+
+        // SỬA LẠI: Dùng getApiService(this) để có Context và Interceptor
+        apiService = RetrofitClient.getApiService(this);
 
         // --- Ánh xạ View ---
         setupViews();
@@ -75,13 +77,13 @@ public class CategoryActivity extends AppCompatActivity {
         recyclerView = findViewById(R.id.recyclerViewCategories);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
-        // Khởi tạo adapter rỗng ban đầu để tránh null
         adapter = new CategoryAdapter(new ArrayList<>());
         recyclerView.setAdapter(adapter);
     }
 
     private void loadCategories() {
-        apiService.getCategories(authToken).enqueue(new Callback<List<Category>>() {
+        // SỬA LẠI: Xóa authToken khỏi lời gọi hàm
+        apiService.getCategories().enqueue(new Callback<List<Category>>() {
             @Override
             public void onResponse(Call<List<Category>> call, Response<List<Category>> response) {
                 if (response.isSuccessful() && response.body() != null) {
@@ -112,9 +114,18 @@ public class CategoryActivity extends AppCompatActivity {
         }
 
         RadioButton selectedRadio = findViewById(selectedId);
+        // (Giả sử R.id.radioIncome là RadioButton cho "Thu nhập")
         String type = (selectedRadio.getId() == R.id.radioIncome) ? "income" : "expense";
 
-        apiService.createCategory(authToken, name, type).enqueue(new Callback<Category>() {
+        // --- SỬA LẠI: Gửi một Category object, không gửi 3 trường riêng lẻ ---
+
+        // 1. Tạo một Category object
+        Category newCategory = new Category();
+        newCategory.setName(name);
+        newCategory.setType(type);
+
+        // 2. Gửi object đó bằng @Body
+        apiService.createCategory(newCategory).enqueue(new Callback<Category>() {
             @Override
             public void onResponse(Call<Category> call, Response<Category> response) {
                 if (response.isSuccessful() && response.body() != null) {

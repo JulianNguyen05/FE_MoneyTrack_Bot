@@ -20,6 +20,7 @@ import java.util.Locale;
 import ht.nguyenhuutrong.fe_moneytrack_bot.R;
 import ht.nguyenhuutrong.fe_moneytrack_bot.api.ApiService;
 import ht.nguyenhuutrong.fe_moneytrack_bot.api.RetrofitClient;
+// TokenManager vẫn cần thiết để check xem đã đăng nhập chưa
 import ht.nguyenhuutrong.fe_moneytrack_bot.api.TokenManager;
 import ht.nguyenhuutrong.fe_moneytrack_bot.models.Category;
 import ht.nguyenhuutrong.fe_moneytrack_bot.models.Wallet;
@@ -36,7 +37,7 @@ public class AddTransactionActivity extends AppCompatActivity {
     private TextView textViewTitle;
 
     private ApiService apiService;
-    private String authToken;
+    // private String authToken; // <-- SỬA LẠI: Không cần nữa, Interceptor sẽ lo
     private TokenManager tokenManager;
 
     private List<Category> categoryList = new ArrayList<>();
@@ -50,8 +51,11 @@ public class AddTransactionActivity extends AppCompatActivity {
         setContentView(R.layout.activity_transaction_form);
 
         tokenManager = new TokenManager(this);
-        authToken = "Bearer " + tokenManager.getToken();
-        apiService = RetrofitClient.getClient().create(ApiService.class);
+        // authToken = "Bearer " + tokenManager.getToken(); // <-- SỬA LẠI: Xóa dòng này
+
+        // SỬA LẠI: Dùng getApiService(this) để Retrofit có Context
+        // và tự động đính kèm Token qua Interceptor
+        apiService = RetrofitClient.getApiService(this);
 
         // Ánh xạ Views
         textViewTitle = findViewById(R.id.textViewTitle);
@@ -77,7 +81,8 @@ public class AddTransactionActivity extends AppCompatActivity {
     }
 
     private void loadCategories() {
-        apiService.getCategories(authToken).enqueue(new Callback<List<Category>>() {
+        // Hàm này gọi apiService.getCategories() đã đúng (không cần authToken)
+        apiService.getCategories().enqueue(new Callback<List<Category>>() {
             @Override
             public void onResponse(Call<List<Category>> call, Response<List<Category>> response) {
                 if (response.isSuccessful() && response.body() != null) {
@@ -107,7 +112,8 @@ public class AddTransactionActivity extends AppCompatActivity {
     }
 
     private void loadWallets() {
-        apiService.getWallets(authToken).enqueue(new Callback<List<Wallet>>() {
+        // Hàm này gọi apiService.getWallets() đã đúng (không cần authToken)
+        apiService.getWallets().enqueue(new Callback<List<Wallet>>() {
             @Override
             public void onResponse(Call<List<Wallet>> call, Response<List<Wallet>> response) {
                 if (response.isSuccessful() && response.body() != null) {
@@ -193,13 +199,24 @@ public class AddTransactionActivity extends AppCompatActivity {
         int walletId = walletList.get(walletPosition).getId();
         String date = getSelectedDateString();
 
-        apiService.createTransaction(authToken, amount, description, date, categoryId, walletId)
+        // --- SỬA LẠI: Gửi một Transaction object, không gửi 5 trường riêng lẻ ---
+
+        // 1. Tạo một Transaction object
+        Transaction newTransaction = new Transaction();
+        newTransaction.setAmount(amount);
+        newTransaction.setDescription(description);
+        newTransaction.setDate(date);
+        newTransaction.setCategory(categoryId); // Giả định model Transaction dùng setCategory(int id)
+        newTransaction.setWallet(walletId);     // Giả định model Transaction dùng setWallet(int id)
+
+        // 2. Gửi object đó bằng @Body
+        apiService.createTransaction(newTransaction)
                 .enqueue(new Callback<Transaction>() {
                     @Override
                     public void onResponse(Call<Transaction> call, Response<Transaction> response) {
                         if (response.isSuccessful()) {
                             Toast.makeText(AddTransactionActivity.this, "Đã lưu giao dịch!", Toast.LENGTH_SHORT).show();
-                            finish();
+                            finish(); // Tự động đóng Activity và quay về MainActivity
                         } else {
                             Toast.makeText(AddTransactionActivity.this, "Lưu thất bại (" + response.code() + ")", Toast.LENGTH_SHORT).show();
                         }
